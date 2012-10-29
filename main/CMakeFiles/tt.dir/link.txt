@@ -1,0 +1,1 @@
+g++   -std=c++0x -g -D_REENTRANT -Wall -MMD- -DLOCALTEST=1 -D_GNU_SOURCE -DVERSION="0.0.0.5" -g    CMakeFiles/tt.dir/SudaServer.cpp.o  -o tt -rdynamic -L../network ../network/libnetworkBase.a -lpthread -Wl,-rpath,../network 

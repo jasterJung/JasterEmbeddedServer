@@ -1,0 +1,2 @@
+/root/win7/Dropbox/Project/Server/network/CMakeFiles/networkBase.dir
+/root/win7/Dropbox/Project/Server/main/CMakeFiles/tt.dir

@@ -1,0 +1,9 @@
+#!/bin/sh 
+
+#valgrind --leak-check=yes -v ./tt
+#--track-origins=yes  //check to be  not initialized value 
+#--tool=memcheck --leak-check=yes
+make 
+valgrind --track-origins=yes --tool=memcheck --leak-check=yes -v $1
+
+
