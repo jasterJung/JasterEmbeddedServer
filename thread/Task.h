@@ -13,7 +13,6 @@
 class Task {
 public:
 	Task();
-	Task():testTest(0){};
 	virtual ~Task(){};
 	int testTest;
 
