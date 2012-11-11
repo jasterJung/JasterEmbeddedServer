@@ -8,17 +8,17 @@
 #ifndef TASK_H_
 #define TASK_H_
 
-//namespace Thread {
+namespace jThread {
 
 class Task {
 public:
 	Task();
-	virtual ~Task(){};
+	virtual ~Task();
 	int testTest;
 
 private:
 	bool m_bStart;
 };
 
-//} /* namespace Thread */
+} /* namespace Thread */
 #endif /* TASK_H_ */

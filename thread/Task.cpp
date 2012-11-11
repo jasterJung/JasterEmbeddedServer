@@ -7,15 +7,12 @@
 
 #include "Task.h"
 
-namespace Thread {
 
-Task::Task() {
+jThread::Task::Task() {
 	// TODO Auto-generated constructor stub
-
 }
 
-Task::~Task() {
+jThread::Task::~Task() {
 	// TODO Auto-generated destructor stub
 }
 
-} /* namespace Thread */

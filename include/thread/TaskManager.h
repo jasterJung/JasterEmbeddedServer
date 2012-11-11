@@ -8,10 +8,11 @@
 #ifndef TASKMANAGER_H_
 #define TASKMANAGER_H_
 
+#include "Task.h"
 
-//namespace Thread {
+namespace jThread {
+
 class ThreadPool;
-
 class TaskManager {
 public:
 	TaskManager();
@@ -34,5 +35,5 @@ private:
 
 
 
-//} /* namespace Thread */
+} /* namespace Thread */
 #endif /* TASKMANAGER_H_ */

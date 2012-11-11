@@ -9,11 +9,9 @@
 
 #include "ThreadPool.h"
 
-TaskManager* TaskManager::m_instanceTaskManager = 0;
+jThread::TaskManager* jThread::TaskManager::m_instanceTaskManager = 0;
 
-class Task;
-
-TaskManager* TaskManager::getInstance()
+jThread::TaskManager* jThread::TaskManager::getInstance()
 {
 	if(!m_instanceTaskManager)
 	{
@@ -22,26 +20,26 @@ TaskManager* TaskManager::getInstance()
 	return m_instanceTaskManager;
 }
 
-TaskManager::TaskManager():th_pool(0)
+jThread::TaskManager::TaskManager():th_pool(0)
 {
 	th_pool = ThreadPool::getInstance();
 }
 
-TaskManager::~TaskManager() {
+jThread::TaskManager::~TaskManager() {
 	th_pool->DestroyThreadPool();
 	delete th_pool;
 }
 
-int TaskManager::open()
+int jThread::TaskManager::open()
 {
 	th_pool->setMaxThreadsNumber(m_nomOfThread);
 	/// check is it possible number.
 	th_pool->CreateThreadPool();
 
 };
-int TaskManager::doTesk(const Task& task)
+int jThread::TaskManager::doTesk(const Task& task)
 {
-	Thread* th;
+	jThread::Thread* th;
 	th = th_pool->GetFreeThread();
 
 	return 0;

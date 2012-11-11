@@ -65,9 +65,9 @@ int ThreadPool::CreateThreadPool()
 
 	return 0;
 }
-const Thread* ThreadPool::GetFreeThread()
+jThread::Thread* ThreadPool::GetFreeThread()
 {
-	Thread* th = 0;
+	jThread::Thread* th = 0;
 	map< int, Thread* >::iterator mi;
 	mi = m_threadMap.begin();
 	while(mi != m_threadMap.end())

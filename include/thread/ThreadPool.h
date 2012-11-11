@@ -7,8 +7,10 @@
 
 using namespace std;
 
-#define MAX_THREADS_NUM 10
-
+//#define MAX_THREADS_NUM 10
+namespace jThread
+{
+	const int MAX_THREADS_NUM = 10;
 
 class ThreadPool
 {
@@ -30,7 +32,7 @@ public:
 	virtual ~ThreadPool(){};
 	static ThreadPool* getInstance();
 	int getMaxThreadsNumber() const;
-	const Thread* GetFreeThread();
+	jThread::Thread* GetFreeThread();
 
 	void setMaxThreadsNumber(int maxThreadsNumber);
 
@@ -40,5 +42,5 @@ public:
 
 };
 
-
+}
 #endif

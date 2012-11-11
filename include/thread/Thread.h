@@ -4,7 +4,7 @@
 #include "Runnable.h"
 #include "ScopeMutex.h"
 #include "condition.h"
-#include "./Task.h"
+#include "Task.h"
 #include <pthread.h>
 
 ///Boolean type
@@ -15,9 +15,9 @@ typedef enum BoolEnum{
 } BOOL;
 #endif
 
-
-
 //Create Thread constructor be created firstly before child 
+namespace jThread
+{
 
 class Thread: public Runnable { // Runnable
 public:
@@ -50,7 +50,7 @@ public:
 	
 	
 private:
-	Task				_task;
+	jThread::Task				_task;
 	int             	_threadId;    // opt. number of thread
 	pthread_t 			_thread;
 	Runnable* 			_runnable;
@@ -66,7 +66,7 @@ private:
 	
 	static void* Main(void* pInst);
 
-
 };
 
+}
 #endif

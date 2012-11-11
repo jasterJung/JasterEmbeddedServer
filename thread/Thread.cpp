@@ -2,7 +2,9 @@
 #include "Thread.h"
 #include <iostream>
 #include <assert.h>
+#include <stdio.h>
 using namespace std;
+using namespace jThread;
 
 Thread::Thread():_running(true),
 		_being_closed_signal(false),
@@ -58,7 +60,7 @@ int Thread::Start() {
 	if(rc < 0 )
 	{
 		perror("thread Create error : ");
-		exit(0);
+		//exit(0);
 	}
 
 }

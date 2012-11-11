@@ -1,2 +1,0 @@
-/usr/bin/ar cr libnetworkBase.a  CMakeFiles/networkBase.dir/ThreadPool.cpp.o CMakeFiles/networkBase.dir/TaskManager.cpp.o CMakeFiles/networkBase.dir/CommonSocketThread.cpp.o CMakeFiles/networkBase.dir/ScopeMutex.cpp.o CMakeFiles/networkBase.dir/condition.cpp.o CMakeFiles/networkBase.dir/Thread.cpp.o
-/usr/bin/ranlib libnetworkBase.a

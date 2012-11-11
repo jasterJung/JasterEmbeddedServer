@@ -12,7 +12,7 @@
 #include "./ScopeMutex.h"
 
 
-class CommonSocketThread: public Thread {
+class CommonSocketThread: public jThread::Thread {
 public:
 	CommonSocketThread();
 	virtual ~CommonSocketThread();

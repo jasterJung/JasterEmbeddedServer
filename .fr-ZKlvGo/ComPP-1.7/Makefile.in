@@ -1,0 +1,34 @@
+
+all: 
+	@make -C SysPlusPlus all
+	@make -C ComPlusPlus all
+	( cd ComPlusPlus; ./Regression.sh )
+
+
+clean: 
+	@make -C SysPlusPlus clean
+	@make -C ComPlusPlus clean
+	rm -f lib/* 
+
+rebuild: 
+	@make -C SysPlusPlus rebuild
+	@make -C ComPlusPlus rebuild
+	( cd ComPlusPlus; ./Regression.sh )
+
+install:
+	@if [ ! -d /usr/include/ComPP/SysPlusPlus ] ; then mkdir -p /usr/include/ComPP/SysPlusPlus ;  fi
+	@if [ ! -d /usr/include/ComPP/ComPlusPlus ] ; then mkdir -p /usr/include/ComPP/ComPlusPlus ;  fi
+	@cp include/SysPlusPlus/* /usr/include/ComPP/SysPlusPlus ;
+	@cp include/ComPlusPlus/* /usr/include/ComPP/ComPlusPlus ;
+	@cp lib/* /usr/lib
+	@echo Com++ is installed under /usr/include/ComPP and /usr/lib
+
+uninstall:
+	@ rm -rf /usr/include/ComPP ;
+	@rm -f /usr/lib/libComPP.a
+	@rm -f /usr/lib/libComPP.so
+	@rm -f /usr/lib/libComPP.*.0
+	@rm -f /usr/lib/libSysPP.a
+	@rm -f /usr/lib/libSysPP.so
+	@rm -f /usr/lib/libSysPP.so.*.0
+
