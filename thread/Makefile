@@ -9,7 +9,12 @@ CC=g++    -D__LINUX__ -D_REENTRANT $(CCDEBUG)
 
 INCPATH=-I ../include/thread -I ./
 LDPATH=-L./
+
+LIBPATH=../lib/
+
+
 AR=ar -r
+MV=mv -i
 
 CCCMD=$(CC) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
 
@@ -17,7 +22,7 @@ EXTRA_CXXFLAGS	= -D_REENTRANT
 
 
 
-TARGET	=   jrThread.a
+TARGET	=   libJrThread.a
 
 OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o
 
@@ -44,11 +49,13 @@ $(TARGET):  $(OBJS)
 		-@echo ""
 		-@echo "** make  $(TARGET)."
 		$(AR) $@ $(OBJS)
+		$(MV) $@ $(LIBPATH)$(TARGET)
 
 clean:
 		-@echo ""
 		-@echo "** cleanning all object file."
 		$(RM) $(TARGET) $(OBJS)
+		$(RM) $(LIBPATH)$(TARGET)
 
 install: $(TARGET)
 		-@echo ""
