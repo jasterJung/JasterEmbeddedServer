@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 	printf("Starting..\n");
 
 	//Need to Context struct.
-	TaskManager* work = TaskManager::getInstance();
+	jThread::TaskManager* work = jThread::TaskManager::getInstance();
 	work->openingPreparation(100);
 	work->open();
 
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	int key = 0;
 	while(1)
 	{
-		Task job;
+		jThread::Task job;
 		printf("input the key\n");
 		scanf("%d", &key);
 		if(key == 9)

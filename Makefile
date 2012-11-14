@@ -1,6 +1,7 @@
 
 all: 
 	@make -C thread all
+	@make -C main all
 	#@make -C dri all
 
 

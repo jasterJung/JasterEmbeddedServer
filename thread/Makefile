@@ -1,11 +1,10 @@
-#include $(PRJHOME)/etc/build.mk
 include ../common.mk
 
 CCOPT=-fpic -O2 -Wall
 
 CCDEBUG=-g
 
-CC=g++    -D__LINUX__ -D_REENTRANT $(CCDEBUG)
+#CC=g++ -D__LINUX__ -D_REENTRANT $(CCDEBUG)
 
 INCPATH=-I ../include/thread -I ./
 LDPATH=-L./
@@ -13,10 +12,10 @@ LDPATH=-L./
 LIBPATH=../lib/
 
 
-AR=ar -r
-MV=mv -i
 
-CCCMD=$(CC) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
+
+
+CCCMD=$(CXX) -D__LINUX__ -D_REENTRANT $(CCDEBUG) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
 
 EXTRA_CXXFLAGS	= -D_REENTRANT
 
@@ -40,7 +39,7 @@ OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o
 
 %.o:%.cpp
 	@echo "compiling...." 
-	$(CCCMD) -c   $*.cpp
+	$(CCCMD) -c $*.cpp
 
 
 all:    $(TARGET)

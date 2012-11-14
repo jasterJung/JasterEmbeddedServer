@@ -1,24 +1,11 @@
 include ../common.mk
 
 CCOPT=-fpic -O2 -Wall
-
 CCDEBUG=-g
-
-CC=g++    -D__LINUX__ -D_REENTRANT $(CCDEBUG) 
-INCPATH	=-I ../include/ -I ./
-LDPATH		=-L./ -L../lib
-
-
-
-AR=ar -r
-MV=mv -i
-
-CCCMD=$(CC) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
+ 
+CCCMD=$(CXX) -D__LINUX__ -D_REENTRANT $(CCDEBUG) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
 EXTRA_CXXFLAGS	= -D_REENTRANT
 
-#LIB
-EXTRALIBSLIB=
-LIBPATH=../lib/
 LIBS=-lpthread -lrt
 LLIBS=-lJrThread $(EXTRALIBSLIB)
 ALLLIBS=$(LLIBS) $(LIBS)
@@ -31,9 +18,6 @@ all : $(TARGET)
 
 $(TARGET) : $(OBJS)
 		$(CXX) ${INCPATH} ${LDPATH} -c $(OBJS) -o $@ ${ALLLIBS}	
-
-#SudaServer: SudaServer.cpp $(LIBPATH)libJrThread.a
-#			$(CC) $(INCPATH) $(LDPATH) -o SudaServer SudaServer.o ${ALLLIBS}
 	
 clean:
 		-@echo "** cleanning all object file."
