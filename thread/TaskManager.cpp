@@ -22,7 +22,7 @@ jThread::TaskManager* jThread::TaskManager::getInstance()
 
 jThread::TaskManager::TaskManager():th_pool(0)
 {
-	th_pool = ThreadPool::getInstance();
+	th_pool = jThread::ThreadPool::getInstance();
 }
 
 jThread::TaskManager::~TaskManager() {
@@ -34,7 +34,7 @@ int jThread::TaskManager::open()
 {
 	th_pool->setMaxThreadsNumber(m_nomOfThread);
 	/// check is it possible number.
-	th_pool->CreateThreadPool();
+	return th_pool->CreateThreadPool();
 
 };
 int jThread::TaskManager::doTesk(const Task& task)

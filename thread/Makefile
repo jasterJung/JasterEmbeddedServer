@@ -4,15 +4,10 @@ CCOPT=-fpic -O2 -Wall
 
 CCDEBUG=-g
 
-#CC=g++ -D__LINUX__ -D_REENTRANT $(CCDEBUG)
-
 INCPATH=-I ../include/thread -I ./
 LDPATH=-L./
 
 LIBPATH=../lib/
-
-
-
 
 
 CCCMD=$(CXX) -D__LINUX__ -D_REENTRANT $(CCDEBUG) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)

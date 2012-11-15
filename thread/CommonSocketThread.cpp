@@ -35,8 +35,11 @@ void CommonSocketThread::Run() {
 	 {
 		 /// Waiting
 		 Thread::getLocker()->lock();
+
 		 Thread::setStatusCanWork(1); //true
+
 		 Thread::getCondition().wait( Thread::getLocker() );
+
 		 Thread::getLocker()->unlock();
 
 		 // it is not free thread anymore. thus set 0

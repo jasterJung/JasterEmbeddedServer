@@ -10,7 +10,8 @@ using namespace std;
 //#define MAX_THREADS_NUM 10
 namespace jThread
 {
-	const int MAX_THREADS_NUM = 10;
+
+const int MAX_THREADS_NUM = 10;
 
 class ThreadPool
 {
@@ -20,7 +21,7 @@ private:
 	int 	m_maxThreadsNumber;
 	map< int, Thread* > m_threadMap;
 
-	//for sync beetwenn pool and Thread.
+	//for sync between pool and Thread.
 	ScopeMutex		m_initThread;
 	ScopeMutex		m_worksLock;
 

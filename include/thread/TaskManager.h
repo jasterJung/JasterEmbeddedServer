@@ -9,10 +9,10 @@
 #define TASKMANAGER_H_
 
 #include "Task.h"
+#include "ThreadPool.h"
 
 namespace jThread {
 
-class ThreadPool;
 class TaskManager {
 public:
 	TaskManager();
@@ -28,7 +28,7 @@ public:
 
 private:
 	// parameter for the Thread- Pool
-	ThreadPool* th_pool;
+	jThread::ThreadPool* th_pool;
 	int m_nomOfThread;
 
 };

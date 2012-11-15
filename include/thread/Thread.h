@@ -15,6 +15,11 @@ typedef enum BoolEnum{
 } BOOL;
 #endif
 
+
+//bool Join ( void ** valueptr = NULL );
+//bool Detach();
+//bool Terminate();
+
 //Create Thread constructor be created firstly before child 
 namespace jThread
 {
