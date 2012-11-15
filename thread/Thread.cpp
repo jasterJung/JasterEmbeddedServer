@@ -8,7 +8,7 @@ using namespace jThread;
 
 Thread::Thread():_running(true),
 		_being_closed_signal(false),
-	 	_status_canWork(0),
+	 	_status_canWork(DOING_WORK),
 		_threadId(0),
 		_thread(0),
 	 	_init_singnal_Mutex(0),
@@ -17,25 +17,30 @@ Thread::Thread():_running(true),
 {
 }
 
-Thread::Thread( Runnable* pRunnable ):_thread(0),_runnable( pRunnable )
-{
+//Thread::Thread( Runnable* pRunnable ):_thread(0),_runnable( pRunnable ){}
 
-}
 Thread::~Thread(){
 
 	cout << "~~~~~~~~~~~~~~~~~~~Thread() "<< endl;
-	//delete _runnable
+
+	//if you create with Runnalbe
 	if(_runnable != 0)
+	{
+		printf ("deleted runnable\n");
 		delete _runnable;
+	}
 }
 
 void Thread::Run()
 {
 	cout << "CALLed the parents thread  :::::::::;->";
+
+	/*
 	if (_runnable != 0) 
 	{
 		_runnable->Run();	
 	}
+	*/
 
 }
 
@@ -62,6 +67,8 @@ int Thread::Start() {
 		perror("thread Create error : ");
 		//exit(0);
 	}
+
+	return 0;
 
 }
 

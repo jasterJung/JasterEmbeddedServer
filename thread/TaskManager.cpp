@@ -7,8 +7,6 @@
 
 #include "TaskManager.h"
 
-#include "ThreadPool.h"
-
 jThread::TaskManager* jThread::TaskManager::m_instanceTaskManager = 0;
 
 jThread::TaskManager* jThread::TaskManager::getInstance()
@@ -20,9 +18,9 @@ jThread::TaskManager* jThread::TaskManager::getInstance()
 	return m_instanceTaskManager;
 }
 
-jThread::TaskManager::TaskManager():th_pool(0)
+jThread::TaskManager::TaskManager():th_pool(0),m_nomOfThread(0)
 {
-	th_pool = jThread::ThreadPool::getInstance();
+	th_pool = ThreadPool::getInstance();
 }
 
 jThread::TaskManager::~TaskManager() {
@@ -40,7 +38,10 @@ int jThread::TaskManager::open()
 int jThread::TaskManager::doTesk(const Task& task)
 {
 	jThread::Thread* th;
+
 	th = th_pool->GetFreeThread();
+
+	th->getCondition().notify();
 
 	return 0;
 }

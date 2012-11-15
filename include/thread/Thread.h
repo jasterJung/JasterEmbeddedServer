@@ -23,12 +23,15 @@ typedef enum BoolEnum{
 //Create Thread constructor be created firstly before child 
 namespace jThread
 {
+const static int WAIT_FOR_WORK = 1;
+const static int DOING_WORK    = 0;
+
 
 class Thread: public Runnable { // Runnable
 public:
 	Thread();
 	//Thread& operator=(const Thread&);
-	Thread(Runnable* pRunnable);
+	//Thread(Runnable* pRunnable);
 	virtual ~Thread();
 	int Start();
 	int Wait();

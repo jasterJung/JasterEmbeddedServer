@@ -36,25 +36,25 @@ void CommonSocketThread::Run() {
 		 /// Waiting
 		 Thread::getLocker()->lock();
 
-		 Thread::setStatusCanWork(1); //true
+		 Thread::setStatusCanWork( jThread::WAIT_FOR_WORK ); //true
+
+		 printf("WAIT_FOR_WORK =  %d \n " , Thread::getThreadId());
 
 		 Thread::getCondition().wait( Thread::getLocker() );
 
 		 Thread::getLocker()->unlock();
 
 		 // it is not free thread anymore. thus set 0
-		 Thread::setStatusCanWork(0); //false
+		 Thread::setStatusCanWork( jThread::DOING_WORK ); //false
 
 		 if(Thread::getClosedSignalFlg())
 			 break;
 
-
-		 //Ended Lock
 		 printf("Thread will run %d \n",Thread::getThreadId());
 
 		 sleep(1);
 
-		 for (int i = 0; i<5; i++)
+		 for (int i = 0; i<80; i++)
 			 printf("Thread runs %d  <========= %d\n",i,Thread::getThreadId());
 	 }
 }

@@ -14,7 +14,6 @@ LDPATH		=-L./ -L../lib
 CCDEBUG=-g
 CXX 	=$(CROSS_COMPILE)g++ 
 AR		=$(CROSS_COMPILE)ar -r 
-MV		=mv -i
 
 INCPATH	=-I ../include/ -I ./
 EXTRALIBSLIB	= 

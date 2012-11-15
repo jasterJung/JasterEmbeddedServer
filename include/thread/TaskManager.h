@@ -17,7 +17,7 @@ class TaskManager {
 public:
 	TaskManager();
 	virtual ~TaskManager();
-	int openingPreparation(int howManyworkerDoyouwant){m_nomOfThread = howManyworkerDoyouwant;};
+	void openingPreparation(int howManyworkerDoyouwant){m_nomOfThread = howManyworkerDoyouwant;};
 	int open();
 
 	//it shall run process with a suitable Task.

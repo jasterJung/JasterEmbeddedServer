@@ -1,4 +1,4 @@
-#include "./ThreadPool.h"
+#include "ThreadPool.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,14 +8,14 @@
 #include <time.h>
 #include <unistd.h>
 
-jThread::ThreadPool* ThreadPool::m_instance = 0;
+jThread::ThreadPool* jThread::ThreadPool::m_instance = 0;
 //pthread_mutex_t ThreadPool::m_init 	 	=  PTHREAD_MUTEX_INITIALIZER;
 //pthread_mutex_t ThreadPool::m_watting  	=  PTHREAD_MUTEX_INITIALIZER;
 
 using namespace std;
 
 //static
-jThread::ThreadPool* ThreadPool::getInstance()
+jThread::ThreadPool* jThread::ThreadPool::getInstance()
 {
 	if(!m_instance)
 	{

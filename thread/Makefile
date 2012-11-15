@@ -18,19 +18,8 @@ EXTRA_CXXFLAGS	= -D_REENTRANT
 
 TARGET	=   libJrThread.a
 
-OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o
+OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o ThreadPool.o CommonSocketThread.o
 
-#.SUFFIXES:  .cpp .hxx
-
-#.cpp.o:
-#		-@echo ""
-#		-@echo "** make object file($@) of $<."
-#		$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(INCLUDES) -c -g -ggdb $<
-
-#.c.o:
-#		-@echo ""
-#		-@echo "** make object file($@) of $<."
-#		$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(INCLUDES) -c $<
 
 %.o:%.cpp
 	@echo "compiling...." 
@@ -51,7 +40,3 @@ clean:
 		$(RM) $(TARGET) $(OBJS)
 		$(RM) $(LIBPATH)$(TARGET)
 
-install: $(TARGET)
-		-@echo ""
-		-@echo "** installing $(TARGET) to $(LIB_DIR)"
-		$(INSTALL) $(TARGET) $(LIB_DIR)
