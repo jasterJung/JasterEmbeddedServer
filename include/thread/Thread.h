@@ -23,8 +23,8 @@ typedef enum BoolEnum{
 //Create Thread constructor be created firstly before child 
 namespace jThread
 {
-const static int WAIT_FOR_WORK = 1;
-const static int DOING_WORK    = 0;
+const static int WAIT_FOR_WORK = 1; /// available resource.
+const static int DOING_WORK    = 0; /// status of busy , you aren't able to this Thread.
 
 
 class Thread: public Runnable { // Runnable

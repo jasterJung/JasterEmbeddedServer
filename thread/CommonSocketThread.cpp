@@ -38,7 +38,7 @@ void CommonSocketThread::Run() {
 
 		 Thread::setStatusCanWork( jThread::WAIT_FOR_WORK ); //true
 
-		 printf("WAIT_FOR_WORK =  %d \n " , Thread::getThreadId());
+		 printf("WAIT_FOR_WORK = ThreadID %d , %d  \n " , Thread::getThreadId(), Thread::getStatusCanWork());
 
 		 Thread::getCondition().wait( Thread::getLocker() );
 
@@ -55,6 +55,9 @@ void CommonSocketThread::Run() {
 		 sleep(1);
 
 		 for (int i = 0; i<80; i++)
-			 printf("Thread runs %d  <========= %d\n",i,Thread::getThreadId());
+		 {
+			 sleep(1);
+			 printf("Thread work %d  <========= %d\n",i,Thread::getThreadId());
+		 }
 	 }
 }
