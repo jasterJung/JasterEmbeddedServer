@@ -40,12 +40,13 @@ void jThread::ThreadPool::setMaxThreadsNumber(int maxThreadsNumber) {
 
 int jThread::ThreadPool::CreateThreadPool()
 {
-	
+	m_threadMap = new Thread[m_maxThreadsNumber];
 	for(int i = 0; i<getMaxThreadsNumber(); i++)
 	{
 		int rc = 0;
 		//init lock
 		// check CommonSocketThead it should generate automatically.
+		m_threadMap[i] =
 		Thread* th = static_cast< Thread* >(new CommonSocketThread());
 
 		/// used to init.
