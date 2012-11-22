@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 
 	//Need to Context struct.
 	jThread::TaskManager* work = jThread::TaskManager::getInstance();
-	work->openingPreparation(100);
+	work->openingPreparation(10);
 	work->open();
 
 	//pthread_cond_signal(&mycond[mi->second.index_num]);
@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-
 exit:
 	printf("End..\n");
 
@@ -44,3 +43,4 @@ exit:
 
 	return 0;
 }
+

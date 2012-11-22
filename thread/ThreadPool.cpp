@@ -79,15 +79,42 @@ jThread::Thread* jThread::ThreadPool::GetFreeThread()
 	jThread::Thread* th = 0;
 	map< int, Thread* >::iterator mi;
 	mi = m_threadMap.begin();
-	while(mi != m_threadMap.end())
+
+
+	for( mi = m_threadMap.begin(); mi != m_threadMap.end(); ++mi)
 	{
-		if(1 == mi->second->getStatusCanWork())
+		if(jThread::WAIT_FOR_WORK == mi->second->getStatusCanWork())
 		{
+			printf("<<<<<<<<<<<<< TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
+			//get free Thread.
 			th = mi->second;
 			break;
 		}
-			//get free Thread.
+		else
+		{
+			printf("BUSY.. TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
+		}
 	}
+
+
+#if 0
+	while(mi != m_threadMap.end())
+	{
+		if(jThread::WAIT_FOR_WORK == mi->second->getStatusCanWork())
+		{
+			printf("<<<<<<<<<<<<< TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
+			//get free Thread.
+			th = mi->second;
+			break;
+		}
+		else
+		{
+			printf("BUSY.. TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
+		}
+
+	}
+#endif
+
 	return th;
 }
 void jThread::ThreadPool::DestroyThreadPool()
