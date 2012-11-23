@@ -18,7 +18,6 @@ Thread::Thread():_running(true),
 }
 
 //Thread::Thread( Runnable* pRunnable ):_thread(0),_runnable( pRunnable ){}
-
 Thread::~Thread(){
 
 	cout << "~~~~~~~~~~~~~~~~~~~Thread() "<< endl;
@@ -31,6 +30,7 @@ Thread::~Thread(){
 	}
 }
 
+//ignored this functions
 void Thread::Run()
 {
 	cout << "CALLed the parents thread  :::::::::;->";
@@ -44,8 +44,8 @@ void Thread::Run()
 
 }
 
-int Thread::Start() {
-
+int Thread::Start()
+{
 	int		rc;
 	//pthread_attr_t threadAtt;
 	rc = pthread_attr_init(&_thread_attr);
@@ -78,20 +78,22 @@ int Thread::Wait() {
 
   _being_closed_signal = true;
 
+  cout << "lock" << endl;
   getInitLocker()->lock();
   getCondition().notify();
   getInitLocker()->unlock();
+  cout << " end" << endl;
 
   int nr = pthread_join(_thread, &pData);
+  cout << "wait and end" << endl;
   return (nr == 0);
 }
 
 //static
 void* Thread::Main(void* pInst)
 {
-  //cout << "Thread::Main() called" << endl;
   Thread* pt = static_cast< Thread* >(pInst);
-  pt->Run(); //bottom and top flow , imple
+  pt->Run(); //bottom and top flow ,
 }
 
 

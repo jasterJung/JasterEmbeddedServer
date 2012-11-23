@@ -4,6 +4,9 @@
 
 #include <pthread.h>
 
+namespace jThread
+{
+
 
 class ScopeMutex
 {
@@ -20,9 +23,20 @@ public:
 
 
 private:
-    pthread_mutex_t      *m_pmutex;
+    pthread_mutex_t       m_pmutex;
     bool                  m_isOwner;
 
 };
+
+class CriticalSection {
+public:
+  CriticalSection ( ScopeMutex & M  );
+  virtual ~CriticalSection();
+
+protected:
+  ScopeMutex*	mMutex;
+};
+
+}
 
 #endif // _MUTEX_H_

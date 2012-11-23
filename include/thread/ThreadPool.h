@@ -1,9 +1,13 @@
 #ifndef __THREADPOOL_H__
 #define __THREADPOOL_H__
 
-#include "./CommonSocketThread.h"
+#include "CommonSocketThread.h"
+#include "Task.h"
+
 #include <pthread.h>
-#include <deque>
+#include <queue>
+#include <vector>
+
 
 using namespace std;
 
@@ -13,11 +17,11 @@ namespace jThread
 typedef enum {
 	OK						= 		1,
 	FALSE					=		2,
-	NOT_ENOUGH_THREAD
+	NOT_ENOUGH_THREAD,
+	HAS_NO_TASK
 }POOL_STATUS;
 
 const int MAX_THREADS_NUM = 256;
-
 
 class ThreadPool
 {
@@ -29,9 +33,8 @@ private:
 #if 1
 
 	//map of matched free threads.
-	queue<int> 			m_threadsMap;
-	Thread 				m_thread[MAX_THREADS_NUM];
-
+	queue<Task> 			m_tasks;
+	vector<Thread*>		m_threads;
 
 #endif
 
@@ -39,28 +42,28 @@ private:
 	//for sync between pool and Thread.
 	ScopeMutex				m_initThread;
 	ScopeMutex				m_worksLock;
-
-	//none copiable
-	//static pthread_mutex_t m_init;
-	//static pthread_mutex_t m_watting;
+	//For critical section
+	ScopeMutex				m_queueCriticalLock;
 	
 public:
 	virtual ~ThreadPool(){};
 	static ThreadPool* getInstance();
 	int getMaxThreadsNumber() const;
 
+#if 0
 	jThread::POOL_STATUS	GetFreeThread(jThread::Thread* rTh);
+#endif
 
 	void setMaxThreadsNumber(int maxThreadsNumber);
 
 	int CreateThreadPool();
 
 	void DestroyThreadPool();
-<<<<<<< HEAD
 
-
-=======
->>>>>>> ce3d10ec1256b497d1cd28b908172546e8aa0012
+//Task Queue
+	//m_queueCriticalLock;
+	const POOL_STATUS getTask(Task& task);
+	const POOL_STATUS setTask(Task& task);
 };
 
 }

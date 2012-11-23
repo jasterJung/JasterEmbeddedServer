@@ -1,53 +1,89 @@
 #include <cerrno>
 #include "ScopeMutex.h"
 
-ScopeMutex::ScopeMutex()
-      :m_pmutex(0),
-       m_isOwner(true)
+jThread::ScopeMutex::ScopeMutex()
+:m_isOwner(true)
 {
-    m_pmutex = new pthread_mutex_t;
-    if (pthread_mutex_init(m_pmutex, 0) == 0)
+    if (pthread_mutex_init( (pthread_mutex_t * ) &m_pmutex, 0) == 0)
     {
         //ok
     }
+
 }
 
-ScopeMutex::~ScopeMutex()
+jThread::ScopeMutex::~ScopeMutex()
 {
     if (m_isOwner)
     {
-        if (pthread_mutex_destroy(m_pmutex) == EBUSY)
+        if (pthread_mutex_destroy(&m_pmutex) == EBUSY)
         {
             unlock();
-            pthread_mutex_destroy(m_pmutex);
+            pthread_mutex_destroy(&m_pmutex);
         }
-        delete m_pmutex;
     }
 }
 
-ScopeMutex::ScopeMutex(const ScopeMutex& copy)
+jThread::ScopeMutex::ScopeMutex(const ScopeMutex& copy)
 {
     m_pmutex = copy.m_pmutex;
     m_isOwner = false;
 }
 
-bool ScopeMutex::lock()
+bool jThread::ScopeMutex::lock()
 {
+	  int ret=0;
+
+	  do {
+	    errno = 0;
+	    ret = pthread_mutex_lock( &m_pmutex);
+	  } while ( ret == -1 && errno == EINTR );
+
+	  if(0 != ret) return false;
+	  return true;
+
+#if 0
     if (pthread_mutex_lock(m_pmutex) == 0)
         return true;
     return false;
+#endif
 }
 
-bool ScopeMutex::unlock()
+bool jThread::ScopeMutex::unlock()
 {
+	  int ret=0;
+
+	  do {
+	    errno = 0;
+	    ret = pthread_mutex_lock( &m_pmutex );
+	  } while ( ret == -1 && errno == EINTR );
+
+	  if(0 != ret) return false;
+	  return true;
+
+#if 0
     if (pthread_mutex_unlock(m_pmutex) == 0)
         return true;
     return false;
+#endif
 }
 
-bool ScopeMutex::tryLock()
+bool jThread::ScopeMutex::tryLock()
 {
-    if (pthread_mutex_trylock(m_pmutex) == 0)
+    if (pthread_mutex_trylock(&m_pmutex) == 0)
         return true;
     return false;
 }
+
+
+
+jThread::CriticalSection::CriticalSection ( jThread::ScopeMutex & M )
+{
+  mMutex = &M;
+  mMutex->lock();
+}
+
+jThread::CriticalSection::~CriticalSection (  )
+{
+  mMutex->unlock();
+}
+

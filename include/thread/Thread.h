@@ -38,12 +38,15 @@ public:
 	virtual void Run();          //
 	const int getThreadId(){return _threadId;};
 	void setThreadId(const int id){_threadId = id;};
-	
-	ScopeMutex* getInitLocker(){return _init_singnal_Mutex;};
+
 	void setInitLocker(ScopeMutex* event){_init_singnal_Mutex = event;};
-	ScopeMutex* getLocker(){return _wait_singnal_Mutex;};
 	void setLocker(ScopeMutex* event){_wait_singnal_Mutex = event;};
+	
+
+	ScopeMutex* getInitLocker(){return _init_singnal_Mutex;};
+	ScopeMutex* getLocker(){return _wait_singnal_Mutex;};
 	Condition& getCondition(){return _singnal_Condition;};
+
 	bool getClosedSignalFlg() {
 		return _being_closed_signal;
 	};
