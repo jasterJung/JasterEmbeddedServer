@@ -10,8 +10,14 @@ using namespace std;
 //#define MAX_THREADS_NUM 10
 namespace jThread
 {
+typedef enum {
+	OK						= 		1,
+	FALSE					=		2,
+	NOT_ENOUGH_THREAD
+}POOL_STATUS;
 
 const int MAX_THREADS_NUM = 10;
+
 
 class ThreadPool
 {
@@ -33,13 +39,15 @@ public:
 	virtual ~ThreadPool(){};
 	static ThreadPool* getInstance();
 	int getMaxThreadsNumber() const;
-	jThread::Thread* GetFreeThread();
+
+	jThread::POOL_STATUS	GetFreeThread(jThread::Thread* rTh);
 
 	void setMaxThreadsNumber(int maxThreadsNumber);
 
 	int CreateThreadPool();
 
 	void DestroyThreadPool();
+
 
 };
 

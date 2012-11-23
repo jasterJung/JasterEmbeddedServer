@@ -6,6 +6,7 @@
  */
 
 #include "TaskManager.h"
+#include <stdio.h>
 
 jThread::TaskManager* jThread::TaskManager::m_instanceTaskManager = 0;
 
@@ -38,11 +39,15 @@ int jThread::TaskManager::open()
 int jThread::TaskManager::doTesk(const Task& task)
 {
 	jThread::Thread* th;
-
-	th = th_pool->GetFreeThread();
-
-	th->getCondition().notify();
-
+	if(OK == th_pool->GetFreeThread(th))
+	{
+		//th->getCondition().notify();
+		printf("get a Free thread ");
+	}
+	else
+	{
+		printf("not enough a thread \n");
+	}
 	return 0;
 }
 

@@ -74,9 +74,10 @@ int jThread::ThreadPool::CreateThreadPool()
 
 	return 0;
 }
-jThread::Thread* jThread::ThreadPool::GetFreeThread()
+
+jThread::POOL_STATUS jThread::ThreadPool::GetFreeThread(jThread::Thread* rTh)
 {
-	jThread::Thread* th = 0;
+	POOL_STATUS rtn = NOT_ENOUGH_THREAD;
 	map< int, Thread* >::iterator mi;
 	mi = m_threadMap.begin();
 
@@ -87,7 +88,8 @@ jThread::Thread* jThread::ThreadPool::GetFreeThread()
 		{
 			printf("<<<<<<<<<<<<< TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
 			//get free Thread.
-			th = mi->second;
+			//rTh = mi->second;
+			rtn = OK;
 			break;
 		}
 		else
@@ -96,26 +98,7 @@ jThread::Thread* jThread::ThreadPool::GetFreeThread()
 		}
 	}
 
-
-#if 0
-	while(mi != m_threadMap.end())
-	{
-		if(jThread::WAIT_FOR_WORK == mi->second->getStatusCanWork())
-		{
-			printf("<<<<<<<<<<<<< TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
-			//get free Thread.
-			th = mi->second;
-			break;
-		}
-		else
-		{
-			printf("BUSY.. TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
-		}
-
-	}
-#endif
-
-	return th;
+	return rtn;
 }
 void jThread::ThreadPool::DestroyThreadPool()
 {
