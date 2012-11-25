@@ -3,7 +3,12 @@
 
 #include <pthread.h>
 
-class ScopeMutex;
+#include "ScopeMutex.h"
+
+namespace jThread
+{
+
+
 
 class Condition
 {
@@ -14,8 +19,8 @@ public:
 
     void   notify();
     void   notifyAll();
-    //void   wait(ScopeMutex& mutex);
-    void   wait(ScopeMutex* mutex);
+
+    void   wait(ScopeMutex& mutex);
     bool   wait(ScopeMutex& mutex, long msec);
 
 
@@ -23,5 +28,9 @@ private:
     pthread_cond_t      *m_pcond;
     bool                 m_isOwner;
 };
+
+
+
+}
 
 #endif // _CONDITION_H_

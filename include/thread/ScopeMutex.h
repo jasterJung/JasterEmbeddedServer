@@ -20,7 +20,7 @@ public:
     bool lock();
     bool unlock();
     bool tryLock();
-
+    pthread_mutex_t* getMutex(){return &m_pmutex; };
 
 private:
     pthread_mutex_t       m_pmutex;

@@ -39,12 +39,12 @@ public:
 	const int getThreadId(){return _threadId;};
 	void setThreadId(const int id){_threadId = id;};
 
-	void setInitLocker(ScopeMutex* event){_init_singnal_Mutex = event;};
-	void setLocker(ScopeMutex* event){_wait_singnal_Mutex = event;};
+	void setInitLocker(ScopeMutex& event){_init_singnal_Mutex = event;};
+	void setLocker(ScopeMutex& event){_wait_singnal_Mutex = event;};
 	
 
-	ScopeMutex* getInitLocker(){return _init_singnal_Mutex;};
-	ScopeMutex* getLocker(){return _wait_singnal_Mutex;};
+	ScopeMutex& getInitLocker(){return _init_singnal_Mutex;};
+	ScopeMutex& getLocker(){return _wait_singnal_Mutex;};
 	Condition& getCondition(){return _singnal_Condition;};
 
 	bool getClosedSignalFlg() {
@@ -71,8 +71,8 @@ private:
  	bool 				_being_closed_signal; //Thread should be close.
 	
 	/// Event is recived from mainStack .
- 	ScopeMutex	*		_init_singnal_Mutex;
- 	ScopeMutex	*		_wait_singnal_Mutex;
+ 	ScopeMutex			_init_singnal_Mutex;
+ 	ScopeMutex			_wait_singnal_Mutex;
 	Condition 			_singnal_Condition;
 	
 	static void* Main(void* pInst);

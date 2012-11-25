@@ -3,10 +3,8 @@
 #include <cerrno>
 
 #include "condition.h"
-#include "ScopeMutex.h"
 
-Condition::Condition()
-          :m_isOwner(true)
+jThread::Condition::Condition():m_isOwner(true)
 {
     m_pcond = new pthread_cond_t;
     if (pthread_cond_init(m_pcond, 0) == 0)
@@ -15,7 +13,7 @@ Condition::Condition()
     }
 }
 
-Condition::~Condition()
+jThread::Condition::~Condition()
 {
     if (m_isOwner)
     {
@@ -34,13 +32,13 @@ Condition::~Condition()
     }
 }
 
-Condition::Condition(const Condition& copy)
+jThread::Condition::Condition(const Condition& copy)
 {
     m_pcond = copy.m_pcond;
     m_isOwner = false;
 }
 
-void Condition::notify()
+void jThread::Condition::notify()
 {
     if (pthread_cond_signal(m_pcond) == 0)
     {
@@ -48,7 +46,7 @@ void Condition::notify()
     }
 }
 
-void Condition::notifyAll()
+void jThread::Condition::notifyAll()
 {
     if (pthread_cond_broadcast(m_pcond) == 0)
     {
@@ -57,16 +55,16 @@ void Condition::notifyAll()
 }
 
 //void Condition::wait(ScopeMutex& mutex)
-void Condition::wait(ScopeMutex* mutex)
+void jThread::Condition::wait(ScopeMutex& mutex)
 {
     //if (pthread_cond_wait(m_pcond, mutex.m_pmutex) == 0)
-	if (pthread_cond_wait(m_pcond, mutex->m_pmutex) == 0)
+	if ( pthread_cond_wait(m_pcond, mutex.getMutex() ) == 0)
     {
         //ok
     }
 }
 
-bool Condition::wait(ScopeMutex& mutex, long msec)
+bool jThread::Condition::wait(ScopeMutex& mutex, long msec)
 {
     timespec  timeout;
     timeval   timenow;
@@ -74,7 +72,7 @@ bool Condition::wait(ScopeMutex& mutex, long msec)
     gettimeofday(&timenow, 0);
     timeout.tv_sec = timenow.tv_sec + msec*1000;
 
-    if (pthread_cond_timedwait(m_pcond, mutex.m_pmutex, &timeout) == 0)
+    if (pthread_cond_timedwait(m_pcond, &mutex.m_pmutex, &timeout) == 0)
         return true;
     return false;
 }
