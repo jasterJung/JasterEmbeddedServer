@@ -11,8 +11,6 @@ Thread::Thread():_running(true),
 	 	_status_canWork(WAIT_FOR_WORK),
 		_threadId(0),
 		_thread(0),
-	 	_init_singnal_Mutex(0),
-	 	_wait_singnal_Mutex(0),
 	 	_runnable(0)
 {
 }
@@ -79,9 +77,9 @@ int Thread::Wait() {
   _being_closed_signal = true;
 
   cout << "lock" << endl;
-  getInitLocker()->lock();
+  getInitLocker().lock();
   getCondition().notify();
-  getInitLocker()->unlock();
+  getInitLocker().unlock();
   cout << " end" << endl;
 
   int nr = pthread_join(_thread, &pData);

@@ -2,8 +2,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "./ScopeMutex.h"
-#include "./condition.h"
+#include "ScopeMutex.h"
+#include "condition.h"
 
 #include <time.h>
 #include <unistd.h>
@@ -46,9 +46,9 @@ int jThread::ThreadPool::CreateThreadPool()
 		//init lock
 		m_threads[i] = static_cast< Thread* >( new CommonSocketThread());
 		/// used to init.
-		m_threads[i]->setInitLocker( &m_initThread	);
+		m_threads[i]->setInitLocker( m_initThread	);
 		// used to mutext in Thread .
-		m_threads[i]->setLocker(	&m_worksLock	);
+		m_threads[i]->setLocker(	m_worksLock	);
 
 		m_threads[i]->setThreadId(i);
 
@@ -57,7 +57,7 @@ int jThread::ThreadPool::CreateThreadPool()
 
 		rc = m_threads[i]->Start();
 
-		m_threads[i]->getCondition().wait(&m_initThread);
+		m_threads[i]->getCondition().wait(m_initThread);
 
 		m_initThread.unlock();
 		}
@@ -99,7 +99,7 @@ jThread::POOL_STATUS jThread::ThreadPool::GetFreeThread(jThread::Thread* rTh)
 void jThread::ThreadPool::DestroyThreadPool()
 {
 
-    for (int i = 0; i < m_threads.size(); i++)
+    for (unsigned int i = 0; i < m_threads.size(); i++)
     {
     	m_threads[i]->Wait();
         delete m_threads[i];
@@ -108,14 +108,15 @@ void jThread::ThreadPool::DestroyThreadPool()
 	pthread_exit(NULL);
 }
 
-const POOL_STATUS jThread::ThreadPool::getTask(Task& task)
+const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task)
 {
 	jThread::CriticalSection criticalLock(m_queueCriticalLock);
-
-
+	m_tasks
+	return OK;
 }
-const POOL_STATUS jThread::ThreadPool::setTask(Task& task)
+const jThread::POOL_STATUS jThread::ThreadPool::setTask(Task& task)
 {
 	jThread::CriticalSection criticalLock(m_queueCriticalLock);
-
+	m_tasks
+	return OK;
 }
