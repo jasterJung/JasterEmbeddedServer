@@ -38,18 +38,12 @@ int jThread::TaskManager::open()
 };
 int jThread::TaskManager::doTesk(const Task& task)
 {
-#if 0
-	jThread::Thread* th;
-	if(OK == th_pool->GetFreeThread(th))
+
+	while(true)
 	{
-		//th->getCondition().notify();
-		printf("get a Free thread ");
+		if(jThread::OK == th_pool->setTask(task))
+			break;
 	}
-	else
-	{
-		printf("not enough a thread \n");
-	}
-#endif
 
 	return 0;
 }

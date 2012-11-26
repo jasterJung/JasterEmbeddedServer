@@ -52,6 +52,8 @@ int jThread::ThreadPool::CreateThreadPool()
 
 		m_threads[i]->setThreadId(i);
 
+		m_threads[i]->setThreadPoolObj(this);
+
 		{
 		m_initThread.lock();
 
@@ -108,15 +110,19 @@ void jThread::ThreadPool::DestroyThreadPool()
 	pthread_exit(NULL);
 }
 
-const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task)
+const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task,int& recommendedSleepTime)
 {
 	jThread::CriticalSection criticalLock(m_queueCriticalLock);
-	m_tasks
+	if(m_tasks.empty())
+		return HAS_NO_TASK;
+	task = m_tasks.front();
+	m_tasks.pop();
+
 	return OK;
 }
 const jThread::POOL_STATUS jThread::ThreadPool::setTask(Task& task)
 {
 	jThread::CriticalSection criticalLock(m_queueCriticalLock);
-	m_tasks
+	m_tasks.push(task);
 	return OK;
 }

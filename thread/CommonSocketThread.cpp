@@ -10,15 +10,18 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "ThreadPool.h"
+#include "Task.h"
+#include "common/CommonNet.h"
 
 using namespace std;
+//using namespace jThread;
+
 
 CommonSocketThread::CommonSocketThread()
 {
-	//Thread::_singnal_Mutext(event);
-	// TODO Auto-generated constructor stub
-}
 
+}
 CommonSocketThread::~CommonSocketThread() {
 	//cout << "~CommonSocketThread() "<< endl;
 }
@@ -53,12 +56,22 @@ void CommonSocketThread::Run() {
 
 		 printf("Thread will run %d \n",Thread::getThreadId());
 
-		 sleep(1);
+		 //control task with thread pool
+		 jThread::Task task;
+		 int  sleepTime = 0;
+
+		 if(jThread::OK 	!= 		Thread::getThreadPoolObj()->getTask(task,sleepTime))
+		 {
+
+		 }
 
 		 for (int i = 0; i<80; i++)
 		 {
 			 sleep(1);
 			 printf("Thread work %d  <========= %d\n",i,Thread::getThreadId());
 		 }
+
+
+		 common::Net::Sleep(sleepTime);
 	 }
 }

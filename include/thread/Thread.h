@@ -25,7 +25,7 @@ namespace jThread
 {
 const static int WAIT_FOR_WORK = 1; /// available resource.
 const static int DOING_WORK    = 0; /// status of busy , you aren't able to this Thread.
-
+class ThreadPool;
 
 class Thread: public Runnable { // Runnable
 public:
@@ -57,9 +57,11 @@ public:
 	void setStatusCanWork(int statusCanWork) {
 		_status_canWork = statusCanWork;
 	};
-	
-	
-	
+
+public:
+	void setThreadPoolObj(ThreadPool* thPool){_thPool = thPool;	};
+	ThreadPool* getThreadPoolObj(){return _thPool;};
+
 private:
 	jThread::Task				_task;
 	int             	_threadId;    // opt. number of thread
@@ -75,6 +77,9 @@ private:
  	ScopeMutex			_wait_singnal_Mutex;
 	Condition 			_singnal_Condition;
 	
+	//Make sure divide to other class.
+	ThreadPool* _thPool;
+
 	static void* Main(void* pInst);
 
 };

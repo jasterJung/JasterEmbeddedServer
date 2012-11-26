@@ -3,6 +3,7 @@
 #include <iostream>
 #include <assert.h>
 #include <stdio.h>
+#include "ThreadPool.h"
 using namespace std;
 using namespace jThread;
 
@@ -11,8 +12,10 @@ Thread::Thread():_running(true),
 	 	_status_canWork(WAIT_FOR_WORK),
 		_threadId(0),
 		_thread(0),
-	 	_runnable(0)
+	 	_runnable(0),
+	 	_thPool(0)
 {
+
 }
 
 //Thread::Thread( Runnable* pRunnable ):_thread(0),_runnable( pRunnable ){}

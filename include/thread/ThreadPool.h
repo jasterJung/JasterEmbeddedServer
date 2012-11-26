@@ -62,7 +62,7 @@ public:
 
 //Task Queue
 	//m_queueCriticalLock;
-	const POOL_STATUS getTask(Task& task);
+	const POOL_STATUS getTask(Task& task,int& recommendedSleepTime);
 	const POOL_STATUS setTask(Task& task);
 };
 
