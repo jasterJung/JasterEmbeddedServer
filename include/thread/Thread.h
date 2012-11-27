@@ -34,33 +34,15 @@ public:
 	//Thread(Runnable* pRunnable);
 	virtual ~Thread();
 	int Start();
-	int Wait();
+	bool Join ( void ** valueptr = NULL );
 	virtual void Run();          //
 	const int getThreadId(){return _threadId;};
 	void setThreadId(const int id){_threadId = id;};
 
-	void setInitLocker(ScopeMutex& event){_init_singnal_Mutex = event;};
-	void setLocker(ScopeMutex& event){_wait_singnal_Mutex = event;};
-	
-
-	ScopeMutex& getInitLocker(){return _init_singnal_Mutex;};
-	ScopeMutex& getLocker(){return _wait_singnal_Mutex;};
-	Condition& getCondition(){return _singnal_Condition;};
-
-	bool getClosedSignalFlg() {
-		return _being_closed_signal;
-	};
-	int getStatusCanWork() const {
-		return _status_canWork;
-	};
-
-	void setStatusCanWork(int statusCanWork) {
-		_status_canWork = statusCanWork;
-	};
-
 public:
 	void setThreadPoolObj(ThreadPool* thPool){_thPool = thPool;	};
 	ThreadPool* getThreadPoolObj(){return _thPool;};
+	bool isRunning(){return _running;};
 
 private:
 	jThread::Task				_task;
@@ -68,14 +50,9 @@ private:
 	pthread_t 			_thread;
 	Runnable* 			_runnable;
 	pthread_attr_t  	_thread_attr;  // thread attributes
+
+protected:
  	bool            	_running;      // true if thread is running
- 	int 			    _status_canWork;      //The status of thread is it waiting,thead ready for work.
- 	bool 				_being_closed_signal; //Thread should be close.
-	
-	/// Event is recived from mainStack .
- 	ScopeMutex			_init_singnal_Mutex;
- 	ScopeMutex			_wait_singnal_Mutex;
-	Condition 			_singnal_Condition;
 	
 	//Make sure divide to other class.
 	ThreadPool* _thPool;

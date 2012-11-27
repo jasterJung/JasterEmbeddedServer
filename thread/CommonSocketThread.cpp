@@ -27,51 +27,56 @@ CommonSocketThread::~CommonSocketThread() {
 }
 
 void CommonSocketThread::Run() {
-	//Thread::Run();
-    //cout << "TestThread::Run() called" <<  Thread::_thread_no << endl;
 
-	 Thread::getInitLocker().lock();
-	 printf("Init-------threads =  %d \n " , Thread::getThreadId());
-	 Thread::getCondition().notify();
-	 Thread::getInitLocker().unlock();
+	//control task with thread pool
+	ThreadPool* thPool = Thread::getThreadPoolObj();
+
+	{
+		thPool->getInitMutex().lock();
+
+		printf("Init-------threads =  %d \n " , Thread::getThreadId());
+
+		thPool->getCondition().notify();
+
+		thPool->getInitMutex().unlock();
+	}
 
 	 while(1)
 	 {
-		 /// Waiting
-		 Thread::getLocker().lock();
+		  jThread::Task task;
 
-		 Thread::setStatusCanWork( jThread::WAIT_FOR_WORK ); //true
-
-		 printf("WAIT_FOR_A_WORK = ThreadID %d , %d  \n " , Thread::getThreadId(), Thread::getStatusCanWork());
-
-		 Thread::getCondition().wait( Thread::getLocker() );
-
-		 Thread::getLocker().unlock();
-
-		 // it is not free thread anymore. thus set 0
-		 Thread::setStatusCanWork( jThread::DOING_WORK ); //false
-
-		 if(Thread::getClosedSignalFlg())
-			 break;
-
-		 printf("Thread will run %d \n",Thread::getThreadId());
-
-		 //control task with thread pool
-		 jThread::Task task;
-		 int  sleepTime = 0;
-
-		 if(jThread::OK 	!= 		Thread::getThreadPoolObj()->getTask(task,sleepTime))
 		 {
+			 thPool->getWorkMutex().lock()
 
+			Thread::_running = false;
+
+			 printf("WAIT_FOR_A_WORK = ThreadID %d \n " , Thread::getThreadId());
+
+			 while(false == thPool->getClosedSignalFlg() && HAS_NO_TASK == thPool->getTask(task))
+			 {
+				 thPool->getworksCondition().wait( thPool->getWorkMutex() );
+			 }
+
+			 if(thPool->getClosedSignalFlg())
+				 break;
+
+			 Thread::_running = true;
+
+			 printf("Thread will run %d \n",Thread::getThreadId());
+
+			 if(OK != thPool->getTask(task))
+				 continue;
+
+
+			 thPool->getWorkMutex().unlock();
 		 }
 
 		 for (int i = 0; i<80; i++)
 		 {
-			 sleep(1);
-			 printf("Thread work %d  <========= %d\n",i,Thread::getThreadId());
+			 common::Net::Sleep(1);
+			 printf("Thread work %d %d %d\n",i,Thread::getThreadId(),task.testint);
 		 }
 
-
-		 common::Net::Sleep(sleepTime);
+		 //common::Net::Sleep(sleepTime);
 	 }
 }

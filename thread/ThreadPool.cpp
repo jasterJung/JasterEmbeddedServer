@@ -23,7 +23,9 @@ jThread::ThreadPool* jThread::ThreadPool::getInstance()
 }
 
 
-jThread::ThreadPool::ThreadPool():m_maxThreadsNumber(MAX_THREADS_NUM)
+jThread::ThreadPool::ThreadPool():
+		m_maxThreadsNumber(MAX_THREADS_NUM),
+		m_being_closed_signal(false)
 {
 
 }
@@ -45,23 +47,20 @@ int jThread::ThreadPool::CreateThreadPool()
 		int rc = 0;
 		//init lock
 		m_threads[i] = static_cast< Thread* >( new CommonSocketThread());
-		/// used to init.
-		m_threads[i]->setInitLocker( m_initThread	);
-		// used to mutext in Thread .
-		m_threads[i]->setLocker(	m_worksLock	);
-
-		m_threads[i]->setThreadId(i);
 
 		m_threads[i]->setThreadPoolObj(this);
 
+		m_threads[i]->setThreadId(i);
+
+
 		{
-		m_initThread.lock();
+			m_initThread.lock();
 
-		rc = m_threads[i]->Start();
+			rc = m_threads[i]->Start();
 
-		m_threads[i]->getCondition().wait(m_initThread);
+			m_initCondition.wait(m_initThread);
 
-		m_initThread.unlock();
+			m_initThread.unlock();
 		}
 
 		assert(rc == 0);
@@ -101,9 +100,14 @@ jThread::POOL_STATUS jThread::ThreadPool::GetFreeThread(jThread::Thread* rTh)
 void jThread::ThreadPool::DestroyThreadPool()
 {
 
+	m_being_closed_signal = true;
+
+	//notify all for delete
+	m_workscondition.notifyAll();
+
     for (unsigned int i = 0; i < m_threads.size(); i++)
     {
-    	m_threads[i]->Wait();
+    	m_threads[i]->Join();
         delete m_threads[i];
     }
 
@@ -112,7 +116,6 @@ void jThread::ThreadPool::DestroyThreadPool()
 
 const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task,int& recommendedSleepTime)
 {
-	jThread::CriticalSection criticalLock(m_queueCriticalLock);
 	if(m_tasks.empty())
 		return HAS_NO_TASK;
 	task = m_tasks.front();
@@ -120,9 +123,14 @@ const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task,int& recommen
 
 	return OK;
 }
-const jThread::POOL_STATUS jThread::ThreadPool::setTask(Task& task)
+const jThread::POOL_STATUS jThread::ThreadPool::setTask(const Task& task)
 {
-	jThread::CriticalSection criticalLock(m_queueCriticalLock);
-	m_tasks.push(task);
+	{
+		jThread::CriticalSection criticalLock(m_worksLock);
+		m_tasks.push(task);
+	}
+	// Signal to all threads.
+	this->getworksCondition().notifyAll();
+
 	return OK;
 }

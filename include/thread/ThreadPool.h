@@ -29,6 +29,7 @@ private:
 	ThreadPool();
 	static ThreadPool* 	m_instance;
 	int 					m_maxThreadsNumber;
+	bool 					m_being_closed_signal;
 
 #if 1
 
@@ -41,9 +42,12 @@ private:
 
 	//for sync between pool and Thread.
 	ScopeMutex				m_initThread;
+	Condition				m_initCondition;
+
 	ScopeMutex				m_worksLock;
+	Condition				m_workscondition;
 	//For critical section
-	ScopeMutex				m_queueCriticalLock;
+	//ScopeMutex				m_queueCriticalLock;
 	
 public:
 	virtual ~ThreadPool(){};
@@ -60,10 +64,21 @@ public:
 
 	void DestroyThreadPool();
 
+	bool getClosedSignalFlg() {
+		return m_being_closed_signal;
+	};
+//threads will use these methods.
+	ScopeMutex& 	getInitMutex(){return m_initThread;};
+	Condition&	  	getCondition(){return m_initCondition;};
+
+// for Task with Queue
+	ScopeMutex& 	getWorkMutex(){return m_worksLock;};
+	Condition&	  	getworksCondition(){return m_workscondition;};
+
 //Task Queue
 	//m_queueCriticalLock;
 	const POOL_STATUS getTask(Task& task,int& recommendedSleepTime);
-	const POOL_STATUS setTask(Task& task);
+	const POOL_STATUS setTask(const Task& task);
 };
 
 }

@@ -6,7 +6,7 @@
  */
 
 #include "Task.h"
-
+#include <cstdlib.h>
 
 jThread::Task::Task() {
 	// TODO Auto-generated constructor stub
@@ -15,4 +15,10 @@ jThread::Task::Task() {
 jThread::Task::~Task() {
 	// TODO Auto-generated destructor stub
 }
+
+int jThread::Task::getTemp()
+{
+	return 1+(rand() % 10);
+}
+
 
