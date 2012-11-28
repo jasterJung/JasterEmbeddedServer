@@ -11,7 +11,7 @@
 #include "./Thread.h"
 #include "./ScopeMutex.h"
 
-class ThreadPool;
+
 class CommonSocketThread: public jThread::Thread {
 public:
 	CommonSocketThread();

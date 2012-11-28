@@ -114,7 +114,7 @@ void jThread::ThreadPool::DestroyThreadPool()
 	pthread_exit(NULL);
 }
 
-const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task,int& recommendedSleepTime)
+const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task)
 {
 	if(m_tasks.empty())
 		return HAS_NO_TASK;

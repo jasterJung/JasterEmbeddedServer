@@ -15,7 +15,7 @@
 #include "common/CommonNet.h"
 
 using namespace std;
-//using namespace jThread;
+using namespace jThread;
 
 
 CommonSocketThread::CommonSocketThread()
@@ -46,7 +46,7 @@ void CommonSocketThread::Run() {
 		  jThread::Task task;
 
 		 {
-			 thPool->getWorkMutex().lock()
+			 thPool->getWorkMutex().lock();
 
 			Thread::_running = false;
 
@@ -74,7 +74,7 @@ void CommonSocketThread::Run() {
 		 for (int i = 0; i<80; i++)
 		 {
 			 common::Net::Sleep(1);
-			 printf("Thread work %d %d %d\n",i,Thread::getThreadId(),task.testint);
+			 printf("Thread work %d %d %d\n",i,Thread::getThreadId(),task.getTemp());
 		 }
 
 		 //common::Net::Sleep(sleepTime);

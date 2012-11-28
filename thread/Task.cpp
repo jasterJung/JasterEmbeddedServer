@@ -6,7 +6,7 @@
  */
 
 #include "Task.h"
-#include <cstdlib.h>
+#include <cstdlib>
 
 jThread::Task::Task() {
 	// TODO Auto-generated constructor stub

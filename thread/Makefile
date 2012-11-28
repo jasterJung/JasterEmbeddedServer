@@ -1,6 +1,7 @@
 include ../common.mk
 
-CCOPT=-fpic -O2 -Wall
+#CCOPT=-fpic -O2 -Wall
+CCOPT=-O2 -Wall
 
 CCDEBUG=-g
 

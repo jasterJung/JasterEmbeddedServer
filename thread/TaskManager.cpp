@@ -34,17 +34,12 @@ int jThread::TaskManager::open()
 	th_pool->setMaxThreadsNumber(m_nomOfThread);
 	/// check is it possible number.
 	return th_pool->CreateThreadPool();
+}
 
-};
 int jThread::TaskManager::doTesk(const Task& task)
 {
-
-	while(true)
-	{
-		if(jThread::OK == th_pool->setTask(task))
-			break;
-	}
-
+	if( jThread::OK == th_pool->setTask(task) )
+		return 1;
 	return 0;
 }
 

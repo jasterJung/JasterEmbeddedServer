@@ -6,11 +6,13 @@ CCOPT=-Wall
 EXTRA_CXXFLAGS	= -D_REENTRANT
 EXTRALIBSLIB=-lstdc++
 LIBS=-lpthread -lrt
-LLIBS=-lJrThread $(EXTRALIBSLIB)
+LLIBS=-lJrThread -linih $(EXTRALIBSLIB)
 ALLLIBS=$(LLIBS) $(LIBS)
  
 TARGET	=SudaServer  
 OBJS	=SudaServer.o
+
+INCPATH += -I../inih_r26 
 
 CCCMD=${CXX} ${EXTRAFLAGS} ${CCOPT} ${CCDEBUG} ${INCPATH}
 
