@@ -26,6 +26,7 @@ OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o Thr
 	@echo "compiling...." 
 	$(CCCMD) -c $*.cpp
 
+re: clean all
 
 all:    $(TARGET)
 

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "ScopeMutex.h"
 #include "condition.h"
+#include "common/CommonNet.h"
 
 #include <time.h>
 #include <unistd.h>
@@ -47,22 +48,22 @@ int jThread::ThreadPool::CreateThreadPool()
 		int rc = 0;
 		//init lock
 		m_threads[i] = static_cast< Thread* >( new CommonSocketThread());
-
-		m_threads[i]->setThreadPoolObj(this);
-
+		assert(getInstance() != 0);
+		m_threads[i]->setThreadPoolObj(getInstance());
 		m_threads[i]->setThreadId(i);
 
-
+#if 0
 		{
-			m_initThread.lock();
-
+			//getInitMutex().lock();
 			rc = m_threads[i]->Start();
-
-			m_initCondition.wait(m_initThread);
-
-			m_initThread.unlock();
+			//getInitCondition().wait(getInitMutex());
+			//getInitMutex().unlock();
 		}
-
+#endif
+#if 1
+		rc = m_threads[i]->Start();
+#endif
+		//common::Net::Sleep(1);
 		assert(rc == 0);
 
 	}
@@ -70,55 +71,42 @@ int jThread::ThreadPool::CreateThreadPool()
 	return 0;
 }
 
-#if 0
-jThread::POOL_STATUS jThread::ThreadPool::GetFreeThread(jThread::Thread* rTh)
-{
-	POOL_STATUS rtn = NOT_ENOUGH_THREAD;
-	vector<Thread*>::iterator iter;
-	mi = m_threadMap.begin();
-
-
-	for( mi = m_threads.begin(); mi != m_threads.end(); ++mi)
-	{
-		if(jThread::WAIT_FOR_WORK == mi->second->getStatusCanWork())
-		{
-			//printf("<<<<<<<<<<<<< TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
-			//get free Thread.
-			//rTh = mi->second;
-			rtn = OK;
-			break;
-		}
-		else
-		{
-			printf("BUSY.. TD %d FLAG %d \n ",mi->second->getThreadId() ,mi->second->getStatusCanWork());
-		}
-	}
-
-	return rtn;
-}
-#endif
 void jThread::ThreadPool::DestroyThreadPool()
 {
+	m_worksLock.lock();
 
 	m_being_closed_signal = true;
 
-	//notify all for delete
 	m_workscondition.notifyAll();
+
+	m_worksLock.unlock();
+
+	//notify all for delete
+	//getworksCondition().notifyAll();
+	printf("notify All [ %d ] \n",m_threads.size());
+
 
     for (unsigned int i = 0; i < m_threads.size(); i++)
     {
-    	m_threads[i]->Join();
+    	//m_worksLock.lock();
+    	m_workscondition.notify();
+    	printf("Join [%d] =>%s \n",i,m_threads[i]->Join() ? "TRUE" : "FALSE");
+    	//m_worksLock.unlock();
         delete m_threads[i];
     }
+
+	//getWorkMutex().unlock();
 
 	pthread_exit(NULL);
 }
 
 const jThread::POOL_STATUS jThread::ThreadPool::getTask(Task& task)
 {
+
 	if(m_tasks.empty())
 		return HAS_NO_TASK;
 	task = m_tasks.front();
+	printf("size is %d\n",m_tasks.size());
 	m_tasks.pop();
 
 	return OK;
@@ -127,10 +115,13 @@ const jThread::POOL_STATUS jThread::ThreadPool::setTask(const Task& task)
 {
 	{
 		jThread::CriticalSection criticalLock(m_worksLock);
+		printf("setted Task------%d\n",m_tasks.size());
 		m_tasks.push(task);
 	}
+
 	// Signal to all threads.
-	this->getworksCondition().notifyAll();
+	m_workscondition.notifyAll();
 
 	return OK;
 }
+

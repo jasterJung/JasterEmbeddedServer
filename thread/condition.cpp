@@ -1,6 +1,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <cerrno>
+#include <stdio.h>
 
 #include "condition.h"
 
@@ -44,6 +45,10 @@ void jThread::Condition::notify()
     {
         //ok
     }
+    else
+    {
+    	printf("signal faild");
+    }
 }
 
 void jThread::Condition::notifyAll()
@@ -60,8 +65,12 @@ void jThread::Condition::wait(ScopeMutex& mutex)
     //if (pthread_cond_wait(m_pcond, mutex.m_pmutex) == 0)
 	if ( pthread_cond_wait(m_pcond, mutex.getMutex() ) == 0)
     {
-        //ok
+
     }
+	else
+	{
+		printf("cond_wait faild\n");
+	}
 }
 
 bool jThread::Condition::wait(ScopeMutex& mutex, long msec)

@@ -6,7 +6,7 @@ jThread::ScopeMutex::ScopeMutex()
 {
     if (pthread_mutex_init( (pthread_mutex_t * ) &m_pmutex, 0) == 0)
     {
-        //ok
+
     }
 
 }
@@ -31,6 +31,7 @@ jThread::ScopeMutex::ScopeMutex(const ScopeMutex& copy)
 
 bool jThread::ScopeMutex::lock()
 {
+#if 0
 	  int ret=0;
 
 	  do {
@@ -40,9 +41,10 @@ bool jThread::ScopeMutex::lock()
 
 	  if(0 != ret) return false;
 	  return true;
+#endif
 
-#if 0
-    if (pthread_mutex_lock(m_pmutex) == 0)
+#if 1
+    if (pthread_mutex_lock(&m_pmutex) == 0)
         return true;
     return false;
 #endif
@@ -50,6 +52,7 @@ bool jThread::ScopeMutex::lock()
 
 bool jThread::ScopeMutex::unlock()
 {
+#if 0
 	  int ret=0;
 
 	  do {
@@ -59,9 +62,9 @@ bool jThread::ScopeMutex::unlock()
 
 	  if(0 != ret) return false;
 	  return true;
-
-#if 0
-    if (pthread_mutex_unlock(m_pmutex) == 0)
+#endif
+#if 1
+    if (pthread_mutex_unlock(&m_pmutex) == 0)
         return true;
     return false;
 #endif
@@ -79,8 +82,12 @@ bool jThread::ScopeMutex::tryLock()
 jThread::CriticalSection::CriticalSection ( jThread::ScopeMutex & M )
 {
   mMutex = &M;
+
+
+
   mMutex->lock();
-}
+
+ }
 
 jThread::CriticalSection::~CriticalSection (  )
 {

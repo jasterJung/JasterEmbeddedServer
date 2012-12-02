@@ -20,6 +20,8 @@ CCCMD=${CXX} ${EXTRAFLAGS} ${CCOPT} ${CCDEBUG} ${INCPATH}
 	-@echo "** make"
 	$(CCCMD) -c $*.cpp
 
+re: clean all
+
 all : $(TARGET)
 
 #default Target

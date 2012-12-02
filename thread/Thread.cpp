@@ -77,9 +77,14 @@ int Thread::Start()
 
 bool Thread::Join ( void **value_ptr  )
 {
-	int i;
-	i = common::Net::Pthread_join ( _thread, value_ptr );
-	return i ? false : true;
+	bool rt = false;
+	if(_running)
+	{
+		rt = common::Net::Pthread_join ( _thread, value_ptr );
+		_running = false;
+	}
+
+	return rt ? false : true;
 }
 
 

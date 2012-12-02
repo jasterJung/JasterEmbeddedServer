@@ -39,11 +39,7 @@ private:
 
 #endif
 
-
-	//for sync between pool and Thread.
-	ScopeMutex				m_initThread;
-	Condition				m_initCondition;
-
+public:
 	ScopeMutex				m_worksLock;
 	Condition				m_workscondition;
 	//For critical section
@@ -67,13 +63,10 @@ public:
 	bool getClosedSignalFlg() {
 		return m_being_closed_signal;
 	};
-//threads will use these methods.
-	ScopeMutex& 	getInitMutex(){return m_initThread;};
-	Condition&	  	getCondition(){return m_initCondition;};
 
 // for Task with Queue
-	ScopeMutex& 	getWorkMutex(){return m_worksLock;};
-	Condition&	  	getworksCondition(){return m_workscondition;};
+//	ScopeMutex& 	getWorkMutex(){return m_worksLock;};
+//	Condition&	  	getworksCondition(){return m_workscondition;};
 
 //Task Queue
 	//m_queueCriticalLock;
