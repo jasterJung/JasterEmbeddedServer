@@ -1,10 +1,11 @@
 include ../common.mk
 
-CCOPT=-fpic -O2 -Wall
+#CCOPT=-fpic -O2 -Wall
+CCOPT=-O2 -Wall
 
 CCDEBUG=-g
 
-INCPATH=-I ../include/thread -I ./
+INCPATH=-I ../include -I ../include/thread -I ./
 LDPATH=-L./
 
 LIBPATH=../lib/
@@ -18,13 +19,14 @@ EXTRA_CXXFLAGS	= -D_REENTRANT
 
 TARGET	=   libJrThread.a
 
-OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o ThreadPool.o CommonSocketThread.o
+OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o ThreadPool.o CommonSocketThread.o CommonNet.o
 
 
 %.o:%.cpp
 	@echo "compiling...." 
 	$(CCCMD) -c $*.cpp
 
+re: clean all
 
 all:    $(TARGET)
 

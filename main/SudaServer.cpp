@@ -1,11 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 #include "thread/TaskManager.h"
+#include "INIReader.h"
 
 
 int main(int argc, char *argv[])
 {
-	printf("Starting..\n");
+	printf("Get_Config..\n");
+	INIReader cfg("server.cfg");
+	int _port = cfg.GetInteger("udp_server","port",0);
+
+	printf("Starting..%d\n" , _port);
+
 
 	//Need to Context struct.
 	jThread::TaskManager* work = jThread::TaskManager::getInstance();
@@ -29,7 +35,6 @@ int main(int argc, char *argv[])
 		}
 		else //action someting
 		{
-			job.testTest = 1;
 			work->doTesk(job);
 		}
 	}

@@ -14,7 +14,7 @@ class Task {
 public:
 	Task();
 	virtual ~Task();
-	int testTest;
+	int getTemp();
 
 private:
 	bool m_bStart;

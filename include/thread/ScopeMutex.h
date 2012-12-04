@@ -25,6 +25,11 @@ public:
 private:
     pthread_mutex_t       m_pmutex;
     bool                  m_isOwner;
+    // prevent copy operations
+    ScopeMutex ( ScopeMutex & );
+    void operator = ( ScopeMutex & );
+
+
 
 };
 
@@ -35,6 +40,7 @@ public:
 
 protected:
   ScopeMutex*	mMutex;
+
 };
 
 }

@@ -10,55 +10,55 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "ThreadPool.h"
+#include "Task.h"
+#include "common/CommonNet.h"
 
 using namespace std;
+using namespace jThread;
+
 
 CommonSocketThread::CommonSocketThread()
 {
-	//Thread::_singnal_Mutext(event);
-	// TODO Auto-generated constructor stub
-}
 
+}
 CommonSocketThread::~CommonSocketThread() {
 	//cout << "~CommonSocketThread() "<< endl;
 }
 
 void CommonSocketThread::Run() {
-	//Thread::Run();
-    //cout << "TestThread::Run() called" <<  Thread::_thread_no << endl;
 
-	 Thread::getInitLocker().lock();
-	 printf("Init-------threads =  %d \n " , Thread::getThreadId());
-	 Thread::getCondition().notify();
-	 Thread::getInitLocker().unlock();
-
+	//control task with thread pool
+	ThreadPool* thPool = Thread::getThreadPoolObj();
 	 while(1)
 	 {
-		 /// Waiting
-		 Thread::getLocker().lock();
+		  jThread::Task task;
 
-		 Thread::setStatusCanWork( jThread::WAIT_FOR_WORK ); //true
+		  {
+			jThread::CriticalSection criticalLock(thPool->m_worksLock);
 
-		 printf("WAIT_FOR_A_WORK = ThreadID %d , %d  \n " , Thread::getThreadId(), Thread::getStatusCanWork());
+			Thread::_running = false;
 
-		 Thread::getCondition().wait( Thread::getLocker() );
+			 while(false == thPool->getClosedSignalFlg() && HAS_NO_TASK == thPool->getTask(task))
+			 {
+				 printf("WAIT_FOR_A_WORK = ThreadID %d \n " , Thread::getThreadId());
+				 thPool->m_workscondition.wait( thPool->m_worksLock );
+			 }
 
-		 Thread::getLocker().unlock();
-
-		 // it is not free thread anymore. thus set 0
-		 Thread::setStatusCanWork( jThread::DOING_WORK ); //false
-
-		 if(Thread::getClosedSignalFlg())
-			 break;
-
-		 printf("Thread will run %d \n",Thread::getThreadId());
-
-		 sleep(1);
-
-		 for (int i = 0; i<80; i++)
+			 if(thPool->getClosedSignalFlg())
+			 {
+				 printf("Get out due to out flag [%d] \n",Thread::getThreadId());
+				 break;
+			 }
+			 Thread::_running = true;
+		  }
+		  //do logic
+		 for (int i = 0; i<10; i++)
 		 {
-			 sleep(1);
-			 printf("Thread work %d  <========= %d\n",i,Thread::getThreadId());
+			 common::Net::Sleep(1);
+			 printf("Thread work %d [ %d ] %d\n",i,Thread::getThreadId(),task.getTemp());
 		 }
+
 	 }
+	printf("this thread should be join %d",Thread::getThreadId());
 }

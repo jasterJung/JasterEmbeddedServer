@@ -15,6 +15,6 @@ CCDEBUG=-g
 CXX 	=$(CROSS_COMPILE)g++ 
 AR		=$(CROSS_COMPILE)ar -r 
 
-INCPATH	=-I ../include/ -I ./
+INCPATH	=-I ../include/ -I ../include/thread -I ./
 EXTRALIBSLIB	= 
 

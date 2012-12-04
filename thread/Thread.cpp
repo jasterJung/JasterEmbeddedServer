@@ -3,16 +3,20 @@
 #include <iostream>
 #include <assert.h>
 #include <stdio.h>
+#include "ThreadPool.h"
+#include "common/CommonNet.h"
+
 using namespace std;
 using namespace jThread;
 
-Thread::Thread():_running(true),
-		_being_closed_signal(false),
-	 	_status_canWork(WAIT_FOR_WORK),
+
+Thread::Thread():_running(false),
 		_threadId(0),
 		_thread(0),
-	 	_runnable(0)
+	 	_runnable(0),
+	 	_thPool(0)
 {
+
 }
 
 //Thread::Thread( Runnable* pRunnable ):_thread(0),_runnable( pRunnable ){}
@@ -71,21 +75,18 @@ int Thread::Start()
 }
 
 
-int Thread::Wait() {
-  void* pData;
+bool Thread::Join ( void **value_ptr  )
+{
+	bool rt = false;
+	if(_running)
+	{
+		rt = common::Net::Pthread_join ( _thread, value_ptr );
+		_running = false;
+	}
 
-  _being_closed_signal = true;
-
-  cout << "lock" << endl;
-  getInitLocker().lock();
-  getCondition().notify();
-  getInitLocker().unlock();
-  cout << " end" << endl;
-
-  int nr = pthread_join(_thread, &pData);
-  cout << "wait and end" << endl;
-  return (nr == 0);
+	return rt ? false : true;
 }
+
 
 //static
 void* Thread::Main(void* pInst)
