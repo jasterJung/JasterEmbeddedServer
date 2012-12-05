@@ -1,9 +1,9 @@
 
-#include "Thread.h"
+#include "thread/Thread.h"
 #include <iostream>
 #include <assert.h>
 #include <stdio.h>
-#include "ThreadPool.h"
+#include "thread/ThreadPool.h"
 #include "common/CommonNet.h"
 
 using namespace std;

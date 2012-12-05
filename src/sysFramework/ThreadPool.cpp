@@ -1,9 +1,9 @@
-#include "ThreadPool.h"
+#include "thread/ThreadPool.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "ScopeMutex.h"
-#include "condition.h"
+#include "thread/ScopeMutex.h"
+#include "thread/condition.h"
 #include "common/CommonNet.h"
 
 #include <time.h>

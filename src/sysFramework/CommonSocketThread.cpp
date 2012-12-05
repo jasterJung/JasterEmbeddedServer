@@ -5,13 +5,13 @@
  *      Author: root
  */
 
-#include "CommonSocketThread.h"
+#include "thread/CommonSocketThread.h"
 
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include "ThreadPool.h"
-#include "Task.h"
+#include "thread/ThreadPool.h"
+#include "thread/Task.h"
 #include "common/CommonNet.h"
 
 using namespace std;

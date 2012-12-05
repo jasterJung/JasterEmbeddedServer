@@ -1,5 +1,5 @@
 #include <cerrno>
-#include "ScopeMutex.h"
+#include "thread/ScopeMutex.h"
 
 jThread::ScopeMutex::ScopeMutex()
 :m_isOwner(true)

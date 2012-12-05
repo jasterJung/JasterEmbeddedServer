@@ -5,7 +5,7 @@
  *      Author: root
  */
 
-#include "TaskManager.h"
+#include "thread/TaskManager.h"
 #include <stdio.h>
 
 jThread::TaskManager* jThread::TaskManager::m_instanceTaskManager = 0;

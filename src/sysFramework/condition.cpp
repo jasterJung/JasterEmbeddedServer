@@ -3,7 +3,7 @@
 #include <cerrno>
 #include <stdio.h>
 
-#include "condition.h"
+#include "thread/condition.h"
 
 jThread::Condition::Condition():m_isOwner(true)
 {

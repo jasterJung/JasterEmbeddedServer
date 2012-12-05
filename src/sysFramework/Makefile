@@ -1,15 +1,14 @@
-include ../common.mk
+include ../../common.mk
 
 #CCOPT=-fpic -O2 -Wall
 CCOPT=-O2 -Wall
 
 CCDEBUG=-g
 
-INCPATH=-I ../include -I ../include/thread -I ./
+INCPATH=-I ../../include -I ./
 LDPATH=-L./
 
-LIBPATH=../lib/
-
+LIBPATH=../../lib/
 
 CCCMD=$(CXX) -D__LINUX__ -D_REENTRANT $(CCDEBUG) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
 
@@ -19,7 +18,8 @@ EXTRA_CXXFLAGS	= -D_REENTRANT
 
 TARGET	=   libJrThread.a
 
-OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o ThreadPool.o CommonSocketThread.o CommonNet.o
+OBJS	=  Task.o TaskManager.o TaskManager.o ScopeMutex.o condition.o Thread.o ThreadPool.o CommonSocketThread.o CommonNet.o\
+ CommonSocket.o
 
 
 %.o:%.cpp

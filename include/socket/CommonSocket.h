@@ -1,5 +1,5 @@
-#ifndef  COMMON_H
-#define  COMMON_H
+#ifndef  COMMONSOCKET_H
+#define  COMMONSOCKET_H
 
 #include <iostream>
 #include <cstring>
@@ -7,7 +7,7 @@
 #define _CommDefaultReadAheadBufferSize (8*1024)
 
 namespace socket {
-class Common {
+class CommonSocket {
 
  protected:
 
@@ -29,10 +29,10 @@ class Common {
  public:
 
     // Destructor
-    virtual ~Common () ;
+    virtual ~CommonSocket() ;
 
     // Constructors
-    Common ( unsigned int buffsz = _CommDefaultReadAheadBufferSize ) ;
+    CommonSocket( unsigned int buffsz = _CommDefaultReadAheadBufferSize ) ;
 
     //Set
     void SetThrowing ( const bool yes = true );
