@@ -1,24 +1,23 @@
 //#include "config.h"
 #include <memory>
 #include <iostream>
-
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+
+#include "common/Tools.h"
+#include "common/CommonNet.h"
+#include "socket/CommonSocket.h"
 
 #if 0
-#include "SysPlusPlus/Tools.h"
-#include "SysPlusPlus/GenCfg.h"
-#include "SysPlusPlus/syscall.h"
-#include "ComPlusPlus/Comm.h"
-#include "ComPlusPlus/File.h"
-#include "ComPlusPlus/Poll.h"
-#include "SysPlusPlus/ComException.h"
-
-#include "ComPlusPlus/Socket.h"
-#include "ComPlusPlus/SocketUdp.h"
-#include "ComPlusPlus/SocketTcp.h"
+#include "socket/Socket.h"
+#include "socket/SocketUdp.h"
+#include "socket/SocketTcp.h"
 #endif
 
-#include "socket/CommonSocket.h"
+
+#include "INIReader.h"
 
 /**
  * Constructor:
@@ -31,24 +30,23 @@
 
 #define MAXUDP 65536
 
-socket::CommonSocket::CommonSocket ( unsigned int readaheadbuffersize ) {
+socketIO::CommonSocket::CommonSocket ( unsigned int readaheadbuffersize ) {
 
   this->fd=-1;
 
-  compp::GenCfg * Cfg = (compp::GenCfg*) compp::GenCfg::Instance();
+  INIReader* cfg = (INIReader*)INIReader::Instance("server.cfg");
 
   // By default always off
   this->ReadAhead                = false;
-
   this->ReadAheadBuffer          = NULL;
   this->ReadAheadBufferTotalSize = readaheadbuffersize ;
   this->ReadAheadBufferSize      = 0;
   this->ReadAheadBufferIndex     = 0;
 
-  this->fd_attached       = Cfg->GetCommFDAttached ();
-  this->WriteTimeout      = Cfg->GetCommWriteTimeout()  ;
-  this->ReadTimeout       = Cfg->GetCommReadTimeout()  ;
-  this->MaxNumBytesToRead = Cfg->GetCommMaxNumBytesToRead();
+  this->fd_attached        = cfg->GetBoolean("socket","FD_ATTACHED",true);
+  this->WriteTimeout       = cfg->GetInteger("socket","WRITE_TIMEOUT",5000000);
+  this->ReadTimeout       = cfg->GetInteger("socket","READ_TIMEOUT",5000000);
+  this->MaxNumBytesToRead = cfg->GetInteger("socket","MAX_NUM_BYTES_TO_READ",1204*1204);
   this->LineDelimiter = '\n';
 
   IsOpen=false;
@@ -62,7 +60,7 @@ socket::CommonSocket::CommonSocket ( unsigned int readaheadbuffersize ) {
  * ATTENTION: It might be adviseable to use Shutdown
  * beforehand on sockets. If not used, unset data could be lost.
 */
-socket::CommonSocket::~CommonSocket ( ) {
+socketIO::CommonSocket::~CommonSocket ( ) {
 
   if ( NULL != ReadAheadBuffer ) {
     delete ReadAheadBuffer;
@@ -81,14 +79,14 @@ socket::CommonSocket::~CommonSocket ( ) {
  * An attached Comm Channel is automatically closed by the
  * destructor.
  */
-void socket::CommonSocket::AttachFD() {
+void socketIO::CommonSocket::AttachFD() {
     this->fd_attached = true;
 }
 
 /*
  *  Deattach the FD.
  */
-void socket::CommonSocket::DetachFD () {
+void socketIO::CommonSocket::DetachFD () {
     this->fd_attached = false;
 }
 
@@ -96,7 +94,7 @@ void socket::CommonSocket::DetachFD () {
  *  Get Attache status.
  * Returnvalue is true is Comm Channel is attached.
  */
-bool socket::CommonSocket::FD_IsAttached() {
+bool socketIO::CommonSocket::FD_IsAttached() {
     return this->fd_attached;
 }
 
@@ -104,12 +102,12 @@ bool socket::CommonSocket::FD_IsAttached() {
  *  Close the descriptor usind close().
  * ATTENTION: Could be improper, if under
  */
-void socket::CommonSocket::Close ( ) {
+void socketIO::CommonSocket::Close ( ) {
 
   if ( this->fd==-1 )
     return ;
 
-  syspp::Call::Close(this->fd);
+  common::Net::Close ( this->fd );
 
   IsOpen=false;
   this->fd=-1;
@@ -122,10 +120,11 @@ void socket::CommonSocket::Close ( ) {
   Throws sys:ComException in case of error
 */
 
-bool socket::CommonSocket::PollSnd ( int usecs )  {
+bool socketIO::CommonSocket::PollSnd ( int usecs )  {
 
   if ( this->fd == -1  ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  return false;
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   fd_set wrset, errset;
@@ -147,9 +146,9 @@ bool socket::CommonSocket::PollSnd ( int usecs )  {
     FD_SET( sfd, &wrset);
     FD_SET( sfd, &errset);
 
-    switch ( syspp::Call::Select ( sfd + 1, NULL,  &wrset,  &errset, tvp ) ) {
+    switch ( common::Net::Select ( sfd + 1, NULL,  &wrset,  &errset, tvp ) ) {
     case -1: {
-      throw  syspp::ComException (  "socket::CommonSocket::PollSnd. Select failed" );
+      //throw  common::ComException (  "socketIO::CommonSocket::PollSnd. Select failed" );
       break;
     }
     case 0: {
@@ -171,14 +170,16 @@ bool socket::CommonSocket::PollSnd ( int usecs )  {
     return false;
 }
 
+
 /**
  *  Polling (actually select()) on the socket read queue.
  * Throws sys:ComException in case of error
  */
-bool socket::CommonSocket::PollRcv ( int usecs )  {
+bool socketIO::CommonSocket::PollRcv ( int usecs )  {
 
   if ( this->fd == -1 ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  return false;
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   fd_set rdset, errset;
@@ -201,9 +202,10 @@ bool socket::CommonSocket::PollRcv ( int usecs )  {
     FD_SET( sfd, &errset);
 
 
-    switch ( syspp::Call::Select ( sfd + 1, &rdset, NULL, &errset, tvp ) ) {
+    switch ( common::Net::Select ( sfd + 1, &rdset, NULL, &errset, tvp ) ) {
     case -1: {
-      throw  syspp::ComException (  "socket::CommonSocket::PollRcv. Select failed" );
+      //throw  common::ComException (  "socketIO::CommonSocket::PollRcv. Select failed" );
+      //printf("")
       break;
     }
     case 0: {
@@ -229,27 +231,30 @@ bool socket::CommonSocket::PollRcv ( int usecs )  {
 /**
  * Making Comm Channel synchronous.
  */
-bool socket::CommonSocket::SetOptBlocking () {
+bool socketIO::CommonSocket::SetOptBlocking () {
 
 #if 0
 u_long iMode = 0;
-syspp::Call::Ioctlsocket(this->fd, FIONBIO, &iMode);
+common::Net::Ioctlsocket(this->fd, FIONBIO, &iMode);
 return true;
 #else
     int i;
 
-    i =  syspp::Call::Fcntl ( this->fd, F_GETFL, 0L ) ;
+    i =  common::Net::Fcntl ( this->fd, F_GETFL, 0L ) ;
 
     if ( -1 == i ) {
-	throw  syspp::ComException (  "socket::CommonSocket::SetOptBlocking (): Could not call fcntl()");
+    	//logging better then exceptions
+    	//throw  common::ComException (  "socketIO::CommonSocket::SetOptBlocking (): Could not call fcntl()");
     }
 
     i ^= O_NONBLOCK;
 
-    i = syspp::Call::Fcntl ( this->fd, F_SETFL, i );
+    i = common::Net::Fcntl ( this->fd, F_SETFL, i );
 
     if ( -1 == i ) {
-	throw  syspp::ComException (  "socket::CommonSocket::SetOptBlocking  Cannot Set Option Blocking");
+    	return false;
+    	//logging better then exceptions
+    	//throw  common::ComException (  "socketIO::CommonSocket::SetOptBlocking  Cannot Set Option Blocking");
     }
 
     return true;
@@ -259,21 +264,24 @@ return true;
 /**
  * Making Comm Channel asynchronous.
  */
-bool socket::CommonSocket::SetOptNonBlocking ( ) {
+bool socketIO::CommonSocket::SetOptNonBlocking ( ) {
 
   int i;
 
-  i =  syspp::Call::Fcntl ( this->fd, F_GETFL, 0L ) ;
+  i =  common::Net::Fcntl ( this->fd, F_GETFL, 0L ) ;
 
   if ( -1 == i ) {
-    throw  syspp::ComException (  "socket::CommonSocket::SetOptNonBlocking Could not call fcntl(GETFL)");
+	  return false;
+	 //logging better then exceptions
+    //throw  common::ComException (  "socketIO::CommonSocket::SetOptNonBlocking Could not call fcntl(GETFL)");
   }
 
   i |= O_NONBLOCK;
-  i = syspp::Call::Fcntl ( this->fd, F_SETFL, i );
+  i = common::Net::Fcntl ( this->fd, F_SETFL, i );
 
   if ( -1 == i ) {
-    throw  syspp::ComException (  "socket::CommonSocket::SetOptNonBlocking Could not call fcntl(SETFL)");
+	 //logging better then exceptions
+    //throw  common::ComException (  "socketIO::CommonSocket::SetOptNonBlocking Could not call fcntl(SETFL)");
   }
 
   return true;
@@ -283,7 +291,7 @@ bool socket::CommonSocket::SetOptNonBlocking ( ) {
   * Returns true, if the Comm Channel is closed
   * Evaluation of this state: never initialsed or closed or other party closed connection
   */
-bool socket::CommonSocket::IsEOF () const{
+bool socketIO::CommonSocket::IsEOF () const{
   if ( this->fd == -1 || FdClosed == true || IsOpen == false ) {
     return true;
   }
@@ -297,16 +305,16 @@ bool socket::CommonSocket::IsEOF () const{
  * Throws CommException, if error occured.
  * Can be used on all sockets.
  */
-int socket::CommonSocket::Write ( const char *buf, const int count ) {
-
-
-  if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
-  }
-
+int socketIO::CommonSocket::Write ( const char *buf, const int count ) {
   int ret;
 
- ret = syspp::Call::Send ( this->fd, (void *) buf, count, 0 );
+  if ( this->fd == -1 || !IsOpen || FdClosed ) {
+	  ret = -1;
+	 //logging better then exceptions
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
+  }
+
+ ret = common::Net::Send ( this->fd, (void *) buf, count, 0 );
 
   if ( ret == -1 && errno == EBADF )
   	  FdClosed=true;
@@ -319,13 +327,15 @@ int socket::CommonSocket::Write ( const char *buf, const int count ) {
  * Write string. Returns the length of the sent string.
  * Throws ComException, if error occured.
  */
-int socket::CommonSocket::Write ( const std::string & buf ) {
+int socketIO::CommonSocket::Write ( const std::string & buf ) {
+  int ret;
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	 ret = -1;
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
-  int ret;
+
 
   ret = Write ( (char *) buf.data(), buf.length()) ;
   return ret;
@@ -335,25 +345,26 @@ int socket::CommonSocket::Write ( const std::string & buf ) {
 /**
  *  R. Steven's writen() on the Comm Channel.
  * If WriteTimeout >0 the timeout is considered
- * Returnvalue is the number of bytes successfully written
+ * Return value is the number of bytes successfully written
  * Throws sys:ComException in case of error.
  */
-int socket::CommonSocket::Writen ( const char *buf, int count ) {
+int socketIO::CommonSocket::Writen ( const char *buf, int count ) {
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  return -1;
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   int i= 0, len = count;
   int remain=0;
   char *c = (char*) buf;
-  syspp::int64 from =0, to = 0, now = 0;
+  common::int64 from =0, to = 0, now = 0;
 
   if ( len == 0 )
     return 0;
 
   if ( WriteTimeout > 0 ) {
-    from = syspp::Tools::Time64();
+    from = common::Tools::Time64();
     now = from;
     to = from + WriteTimeout;
   }
@@ -373,7 +384,8 @@ int socket::CommonSocket::Writen ( const char *buf, int count ) {
 
    if ( i <= 0 ) {
      if ( errno != EAGAIN )
-       throw syspp::ComException ( "Error writing to Comm Channel" );
+    	 	 return -1;
+       //throw common::ComException ( "Error writing to Comm Channel" );
      if ( i == 0 )
        errno = 0;
      return i;
@@ -390,7 +402,7 @@ int socket::CommonSocket::Writen ( const char *buf, int count ) {
 
    if ( WriteTimeout > 0 ) {
 
-     now = syspp::Tools::Time64();
+     now = common::Tools::Time64();
 
      if ( now > to ) {
 	errno = EAGAIN;
@@ -406,7 +418,7 @@ int socket::CommonSocket::Writen ( const char *buf, int count ) {
  * R. Steven's writen() of a string.
  * Throws sys:ComException, if things go wrong.
  */
-int socket::CommonSocket::Writen ( const std::string & buf ) {
+int socketIO::CommonSocket::Writen ( const std::string & buf ) {
 
 //   if ( dynamic_cast<compp::SocketUdp*>(this) !=NULL ) {
 // 	compp::SocketUdp *s = dynamic_cast<compp::SocketUdp*>(this);
@@ -415,14 +427,16 @@ int socket::CommonSocket::Writen ( const std::string & buf ) {
 //   }
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  printf("socketIO::CommonSocket::Ressource not opened");
+	  return -1;
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   return Writen ( buf.c_str(), buf.length() ) ;
 }
 
 
-int socket::CommonSocket::operator<< ( const std::string & buf ) {
+int socketIO::CommonSocket::operator<< ( const std::string & buf ) {
 
 	return Writen (buf );
 
@@ -433,20 +447,21 @@ int socket::CommonSocket::operator<< ( const std::string & buf ) {
  * Throws sys:ComException in case of error
  *
  */
-int socket::CommonSocket::Read ( char *buf, int count ) {
+int socketIO::CommonSocket::Read ( char *buf, int count ) {
 
   if ( count <= 0 )
     return count;
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  std::cout << "socketIO::CommonSocket::Ressource not opened\n";
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   int ret;
   //   std::cout << "Read ReadAheadBufferSize:" <<ReadAheadBufferSize << " ReadAhead:" << ReadAhead <<"\n" ;
   if ( ReadAhead == false ) {
 
-    ret = syspp::Call::Recv ( this->fd, (void *) buf, count,0  );
+    ret = common::Net::Recv ( this->fd, (void *) buf, count,0  );
     if ( ret == 0  )
       FdClosed=true;
     return ret ;
@@ -456,7 +471,7 @@ int socket::CommonSocket::Read ( char *buf, int count ) {
   // Read ahead enabled
   if ( this->ReadAheadBufferSize == 0 ) {    // Buffer empty
      if ( (unsigned int ) count > ReadAheadBufferTotalSize ) {  // Special Case: More ocets requested than sizeof buffer. Solution: bypassing buffer.
-     ret = syspp::Call::Recv ( this->fd, (void *) buf, count, 0 );
+     ret = common::Net::Recv ( this->fd, (void *) buf, count, 0 );
      //     std::cout << "Special Case\n" ;
        if ( ret == 0  )
  	FdClosed=true;
@@ -464,7 +479,7 @@ int socket::CommonSocket::Read ( char *buf, int count ) {
      }
     // Buffer Reload
     // Buffer is empty and we request less than number of buffered octets
-    this->ReadAheadBufferSize = syspp::Call::Recv( this->fd, (void *) this->ReadAheadBuffer, ReadAheadBufferTotalSize , 0);
+    this->ReadAheadBufferSize = common::Net::Recv( this->fd, (void *) this->ReadAheadBuffer, ReadAheadBufferTotalSize , 0);
     //     std::cout << "Reload ReadAheadBufferSize:" << ReadAheadBufferSize  << "\n" ;
 
     this->ReadAheadBufferIndex = 0;
@@ -496,10 +511,10 @@ int socket::CommonSocket::Read ( char *buf, int count ) {
  * Read a maximum of count characters and store into string.
  * Throws sys:ComException in case of error
  */
-int socket::CommonSocket::Read ( std::string &buf, int count ) {
+int socketIO::CommonSocket::Read ( std::string &buf, int count ) {
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  std::cout << "socketIO::CommonSocket::Ressource not opened\n";
   }
 
     buf = "";
@@ -509,7 +524,8 @@ int socket::CommonSocket::Read ( std::string &buf, int count ) {
 
     for ( i = 0; i < count; ) {
 	if ( ( ret = Read (c, count-i )) == -1 ) {
-			throw syspp::ComException ( " Read Error ");
+			std::cout <<" Read Error \n";
+			//throw common::ComException ( " Read Error ");
     	}
         if ( ret == 0 ) {
   	  FdClosed=true;
@@ -528,14 +544,16 @@ int socket::CommonSocket::Read ( std::string &buf, int count ) {
  * Read until a newline is found (similar to Readln found in Pascal ).
  * not optimized. Still very slow.
  */
-bool socket::CommonSocket::ReadLn ( char * buf, int count ) {
+bool socketIO::CommonSocket::ReadLn ( char * buf, int count ) {
 
   if ( dynamic_cast<compp::SocketUdp*>(this) !=NULL ) {
-  	    throw  syspp::ComException (  "socket::CommonSocket::ReadLn does not make sense on UDP Socket");
+	  std::cout <<"socketIO::CommonSocket::ReadLn does not make sense on UDP Socket\n";
+	  //throw  common::ComException (  "socketIO::CommonSocket::ReadLn does not make sense on UDP Socket");
   }
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  std::cout <<"socketIO::CommonSocket::Ressource not opened\n";
+	  //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   int i, j;
@@ -566,15 +584,17 @@ bool socket::CommonSocket::ReadLn ( char * buf, int count ) {
  * Throws sys:ComException in case of error
  *
  */
-bool socket::CommonSocket::ReadLn ( std::string & s ) {
+bool socketIO::CommonSocket::ReadLn ( std::string & s ) {
 
   s ="";
   if ( dynamic_cast<compp::SocketUdp*>(this) !=NULL ) {
-  	    throw  syspp::ComException (  "socket::CommonSocket::ReadLN does not make sense on UDP Socket");
+	  	 std::cout << "socketIO::CommonSocket::ReadLN does not make sense on UDP Socket";
+  	    //throw  common::ComException (  "socketIO::CommonSocket::ReadLN does not make sense on UDP Socket");
   }
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  std::cout << "socketIO::CommonSocket::Ressource not opened\n";
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   int i, j;
@@ -603,22 +623,23 @@ bool socket::CommonSocket::ReadLn ( std::string & s ) {
  * Throws sys:ComException in case of error
  */
 
-int socket::CommonSocket::Readn ( char *buf, int count )  {
+int socketIO::CommonSocket::Readn ( char *buf, int count )  {
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	  std::cout << "socketIO::CommonSocket::Ressource not opened";
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   int i=0, bytesdone =0, len = count, timeleft;
   int remain;
   char *c = (char*) buf;
-  syspp::int64 from=0, to=0, now =0 ;
+  common::int64 from=0, to=0, now =0 ;
 
 
   if ( ReadTimeout > 0 ) {
-    from = syspp::Tools::Time64() ;
+    from = common::Tools::Time64() ;
     to = from + ReadTimeout;
-    now = syspp::Tools::Time64() ;
+    now = common::Tools::Time64() ;
   }
 
 
@@ -647,7 +668,8 @@ int socket::CommonSocket::Readn ( char *buf, int count )  {
     }
     if ( i < 0 ) {
       if ( errno != EAGAIN ) {
-      	throw syspp::ComException ( "Read Error ");
+      	//throw common::ComException ( "Read Error ");
+    	  std::cout << "Read Error \n";
       } else {
 	errno = 0;
       }
@@ -666,7 +688,7 @@ int socket::CommonSocket::Readn ( char *buf, int count )  {
 
     if ( ReadTimeout > 0 ) {
 
-      now = syspp::Tools::Time64();
+      now = common::Tools::Time64();
       if ( now > to) {
 	errno = EAGAIN;
 	return (len - remain);
@@ -685,22 +707,23 @@ int socket::CommonSocket::Readn ( char *buf, int count )  {
  * Returnvalue is number of bytes read.
  * Throws sys:ComException in case of error
  */
-int socket::CommonSocket::Readn ( std::string &buf, int count ) {
+int socketIO::CommonSocket::Readn ( std::string &buf, int count ) {
 
   if ( this->fd == -1 || !IsOpen || FdClosed ) {
-    throw  syspp::ComException (  "socket::CommonSocket::Ressource not opened");
+	 std::cout >> "socketIO::CommonSocket::Ressource not opened\n";
+    //throw  common::ComException (  "socketIO::CommonSocket::Ressource not opened");
   }
 
   int i;
   std::auto_ptr<char> c (new char[count+1]);
 
-  try {
+  //try {
     i = this->Readn ( (char*)c.get(),  count ) ;
     buf= "";
     buf.append ( c.get(), i );
-  } catch ( syspp::ComException e)  {
-	  	throw syspp::ComException( e.what());
-  }
+  //} catch ( common::ComException e)  {
+	  	//throw common::ComException( e.what());
+  //}
   return i;
 
 }
@@ -710,52 +733,52 @@ int socket::CommonSocket::Readn ( std::string &buf, int count ) {
  * and and is releveant to all Read.. () methods, which
  * do not have "count" parameter.
  */
-void socket::CommonSocket::SetMaxNumBytesToRead ( int num ) {
+void socketIO::CommonSocket::SetMaxNumBytesToRead ( int num ) {
   MaxNumBytesToRead = num;
 }
 
 /**
   * Modifier
   **/
-void socket::CommonSocket::SetWriteTimeout( int tmout  ) {
+void socketIO::CommonSocket::SetWriteTimeout( int tmout  ) {
   WriteTimeout = tmout ;
 }
 /**
   * Accessor
   **/
-int socket::CommonSocket::GetWriteTimeout( ) const {
+int socketIO::CommonSocket::GetWriteTimeout( ) const {
   return WriteTimeout  ;
 }
 /**
   * Modifier
   **/
-void socket::CommonSocket::SetReadTimeout( int tmout ) {
+void socketIO::CommonSocket::SetReadTimeout( int tmout ) {
   ReadTimeout = tmout ;
 }
 /**
   * Accessor
   **/
-int socket::CommonSocket::GetReadTimeout() const {
+int socketIO::CommonSocket::GetReadTimeout() const {
   return ReadTimeout ;
 }
 
 /**
   * Accessor
   **/
-int socket::CommonSocket::GetFd () const {
+int socketIO::CommonSocket::GetFd () const {
   return fd;
 }
 
 /**
   * Modifier
   **/
-void socket::CommonSocket::SetLineDelimiter ( char c ) {
+void socketIO::CommonSocket::SetLineDelimiter ( char c ) {
    this->LineDelimiter = c;
 }
 /**
   * Modifier
   **/
-void socket::CommonSocket::SetReadAhead ( bool yn ) {
+void socketIO::CommonSocket::SetReadAhead ( bool yn ) {
 
    if ( dynamic_cast<compp::SocketUdp*>(this) !=NULL ) {
      this->ReadAhead = false;

@@ -16,6 +16,9 @@
 class INIReader
 {
 public:
+
+	 static INIReader*	instance_;
+	 static INIReader*	Instance(std::string filename);
     // Construct INIReader and parse given filename. See ini.h for more info
     // about the parsing.
     INIReader(std::string filename);

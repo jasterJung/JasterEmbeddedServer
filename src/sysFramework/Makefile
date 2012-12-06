@@ -5,12 +5,17 @@ CCOPT=-O2 -Wall
 
 CCDEBUG=-g
 
-INCPATH=-I ../../include -I ./
-LDPATH=-L./
+INCPATH=-I ../../include -I ./ -I ../../inih_r26
+LDPATH=-L ../../lib
 
 LIBPATH=../../lib/
 
-CCCMD=$(CXX) -D__LINUX__ -D_REENTRANT $(CCDEBUG) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH)
+LIBS=-lpthread -lrt
+LLIBS= -linih $(EXTRALIBSLIB)
+ALLLIBS=$(LLIBS) $(LIBS)
+
+
+CCCMD=$(CXX) -D__LINUX__ -D_REENTRANT $(CCDEBUG) $(EXTRAFLAGS)  $(CCOPT) $(CCDEBUG) $(INCPATH) $(LDPATH) $(ALLLIBS)
 
 EXTRA_CXXFLAGS	= -D_REENTRANT
 

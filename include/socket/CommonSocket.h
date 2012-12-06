@@ -6,7 +6,8 @@
 
 #define _CommDefaultReadAheadBufferSize (8*1024)
 
-namespace socket {
+namespace socketIO {
+
 class CommonSocket {
 
  protected:

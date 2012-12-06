@@ -8,6 +8,17 @@
 
 using std::string;
 
+INIReader* INIReader::instance_ = NULL;
+
+
+INIReader* INIReader::Instance(string filename) {
+
+    if (instance_ == NULL) {
+    	instance_ = new INIReader(filename);
+    }
+    return instance_;
+}
+
 INIReader::INIReader(string filename)
 {
     _error = ini_parse(filename.c_str(), ValueHandler, this);
